@@ -1,3 +1,4 @@
+import { APIResponse } from '@playwright/test';
 import { test, expect } from '../fixtures/fixtures';
 import { RegistrationFormDataBuilder } from '../utils/fakeuser';
 
@@ -66,8 +67,7 @@ test.describe('Automation Exercise - E2E - Signup / Login', () => {
 
         await test.step('Assert', async () => {
             const response = await apiClient.getUserDetails(validRegistrationData)
-            const json = await response.json()
-            expect(json.responseCode).toBe(404)
+            verifyStatusCode(response, 404)
         });
     });
 
@@ -93,8 +93,7 @@ test.describe('Automation Exercise - E2E - Signup / Login', () => {
         */
         await test.step('Arrange', async () => {
             const response = await apiClient.createAccount(validRegistrationData);
-            const json = await response.json()
-            expect(json.responseCode).toBe(201)
+            verifyStatusCode(response, 201)
         });
 
         await test.step('Act', async () => {
@@ -110,12 +109,17 @@ test.describe('Automation Exercise - E2E - Signup / Login', () => {
 
         await test.step('Assert', async () => {
             const response = await apiClient.getUserDetails(validRegistrationData)
-            const json = await response.json()
-            expect(json.responseCode).toBe(404)
+            verifyStatusCode(response, 404)
         });
     });
 
 });
+
+async function verifyStatusCode(response: APIResponse, statusCode: number): Promise<void> {
+        const json = await response.json()
+        expect(json.responseCode).toBe(statusCode)
+}
+
 
 /*
 type User = {
