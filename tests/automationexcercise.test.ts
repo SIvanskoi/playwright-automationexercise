@@ -1,6 +1,9 @@
 import { test, expect } from '../fixtures/fixtures';
 import { RegistrationFormDataBuilder} from '../utils/fakeuser';
 import { verifyResponse } from '../api/api.client'
+import path from 'path';
+import fs from 'fs';
+
 
 
 const validRegistrationData = new RegistrationFormDataBuilder()
@@ -186,7 +189,7 @@ test.describe('Automation Exercise - E2E - Signup / Login', () => {
             type: "userstory",
             description: "https://link.in.jira.net/browse/AE-005",
         }
-    }, async ({homePage, loginPage, signupPage, navigationBar, apiClient}) => {
+    }, async ({homePage, loginPage, navigationBar, apiClient}) => {
         /*
         Steps
         1.  Launch browser
@@ -215,6 +218,59 @@ test.describe('Automation Exercise - E2E - Signup / Login', () => {
         });
 
     });
+
+});
+
+
+test.describe('Automation Exercise - E2E - Pages', () => {
+
+    test.beforeEach(async ({homePage}) => {
+        await homePage.open();
+    });
+
+    test('Test Case 6: Contact Us Form', {
+        annotation: {
+            type: "userstory",
+            description: "https://link.in.jira.net/browse/AE-006",
+        }
+    }, async ({homePage, navigationBar, contactUsPage}) => {
+        /*
+        Steps
+        1.  Launch browser
+        2.  Navigate to url {{base_url}}
+        3.  Verify that home page is visible successfully
+        4.  Click on 'Contact Us' button
+        5.  Verify 'GET IN TOUCH' is visible
+        6.  Enter name, email, subject and message
+        7.  Upload file
+        8.  Click 'Submit' button
+        9.  Click OK button
+        10. Verify success message 'Success! Your details have been submitted successfully.' is visible
+        11. Click 'Home' button and verify that landed to home page successfully
+        */
+
+        const filePath = path.join(__dirname, 'output.tmp');
+        const message = 'Hello from TypeScript!';
+
+        await test.step('Arrange', async () => {    
+            fs.writeFileSync(filePath, message, 'utf8');
+        });
+
+        await test.step('Act', async () => {
+            await expect.soft(homePage.automationExcerciseHeading).toBeVisible();
+            await navigationBar.contactUsButton.click();
+            await expect(contactUsPage.getInTouchHeading).toBeVisible();
+            await contactUsPage.submitContactUsForm(validRegistrationData, message, message, filePath)
+            await expect.soft(contactUsPage.submitStatus).toBeVisible()
+            await contactUsPage.homeButton.click()
+        });
+
+        await test.step('Assert', async () => {
+            await expect(homePage.automationExcerciseHeading).toBeVisible();
+        });
+
+    });
+
 
 });
 

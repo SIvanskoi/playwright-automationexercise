@@ -10,6 +10,7 @@ export class NavigationBar extends BasePage {
     readonly signupLoginButton: Locator;
     readonly logoutButton: Locator;
     readonly deleteAccountButton: Locator;
+    readonly contactUsButton: Locator;
 
     constructor(page: Page) {
         super(page)
@@ -20,6 +21,7 @@ export class NavigationBar extends BasePage {
         this.signupLoginButton = this.page.getByRole('link', { name: 'Signup / Login' })
         this.logoutButton = this.page.getByRole('link', { name: 'Logout' })
         this.deleteAccountButton = this.page.getByRole('link', { name: 'Delete Account' })
+        this.contactUsButton = this.page.getByRole('link', { name: 'Contact us' })
     }
 
 }

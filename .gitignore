@@ -1,4 +1,6 @@
 .env
+*.tmp
+
 tests/example.spec.ts
 
 # Playwright
