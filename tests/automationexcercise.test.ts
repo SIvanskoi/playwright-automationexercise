@@ -4,8 +4,8 @@ import { verifyResponse } from '../api/api.client'
 
 
 const validRegistrationData = new RegistrationFormDataBuilder()
-    .withEmail(process.env.EMAIL!)
-    .withPassword(process.env.PASSWORD!)
+    .withEmail(process.env.AE_EMAIL!)
+    .withPassword(process.env.AE_PASSWORD!)
     .build()
 
 
