@@ -12,6 +12,10 @@ const validRegistrationData = new RegistrationFormDataBuilder()
     .build()
 
 
+test.beforeEach(async ({homePage}) => {
+        await homePage.open();
+    });
+
 test.describe('Automation Exercise - E2E - Signup / Login', () => {
     
     // Delete existing account after each test
@@ -19,9 +23,6 @@ test.describe('Automation Exercise - E2E - Signup / Login', () => {
         await apiClient.deleteAccount(validRegistrationData);        
     });
 
-    test.beforeEach(async ({homePage}) => {
-        await homePage.open();
-    });
 
     test('Test Case 1: Register new user', {
         annotation: {
@@ -223,10 +224,6 @@ test.describe('Automation Exercise - E2E - Signup / Login', () => {
 
 
 test.describe('Automation Exercise - E2E - Pages', () => {
-
-    test.beforeEach(async ({homePage}) => {
-        await homePage.open();
-    });
 
     test('Test Case 6: Contact Us Form', {
         annotation: {
