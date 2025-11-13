@@ -1,6 +1,6 @@
-import { APIResponse } from '@playwright/test';
 import { test, expect } from '../fixtures/fixtures';
-import { RegistrationFormDataBuilder } from '../utils/fakeuser';
+import { RegistrationFormDataBuilder} from '../utils/fakeuser';
+import { verifyResponse } from '../api/api.client'
 
 
 const validRegistrationData = new RegistrationFormDataBuilder()
@@ -11,7 +11,7 @@ const validRegistrationData = new RegistrationFormDataBuilder()
 
 test.describe('Automation Exercise - E2E - Signup / Login', () => {
     
-    // Try to delete account after each test
+    // Delete existing account after each test
     test.afterEach(async ({ apiClient }) => {
         await apiClient.deleteAccount(validRegistrationData);        
     });
@@ -20,7 +20,7 @@ test.describe('Automation Exercise - E2E - Signup / Login', () => {
         await homePage.open();
     });
 
-    test('Test Case 1: Register User', {
+    test('Test Case 1: Register new user', {
         annotation: {
             type: "userstory",
             description: "https://link.in.jira.net/browse/AE-001",
@@ -67,12 +67,12 @@ test.describe('Automation Exercise - E2E - Signup / Login', () => {
 
         await test.step('Assert', async () => {
             const response = await apiClient.getUserDetails(validRegistrationData)
-            verifyStatusCode(response, 404)
+            verifyResponse(response, 404)
         });
     });
 
 
-    test('Test Case 2: Login User with correct email and password', {
+    test('Test Case 2: Login user with correct email and password', {
         annotation: {
             type: "userstory",
             description: "https://link.in.jira.net/browse/AE-002",
@@ -93,7 +93,7 @@ test.describe('Automation Exercise - E2E - Signup / Login', () => {
         */
         await test.step('Arrange', async () => {
             const response = await apiClient.createAccount(validRegistrationData);
-            verifyStatusCode(response, 201)
+            verifyResponse(response, 201, 'User created!')
         });
 
         await test.step('Act', async () => {
@@ -109,75 +109,115 @@ test.describe('Automation Exercise - E2E - Signup / Login', () => {
 
         await test.step('Assert', async () => {
             const response = await apiClient.getUserDetails(validRegistrationData)
-            verifyStatusCode(response, 404)
+            verifyResponse(response, 404)
         });
+    });
+
+    test('Test Case 3: Login user with incorrect email and password', {
+        annotation: {
+            type: "userstory",
+            description: "https://link.in.jira.net/browse/AE-003",
+        }
+    }, async ({homePage, loginPage, navigationBar}) => {
+        /*
+        Steps
+        1. Launch browser
+        2. Navigate to url {{base_url}}
+        3. Verify that home page is visible successfully
+        4. Click on 'Signup / Login' button
+        5. Verify 'Login to your account' is visible
+        6. Enter incorrect email address and password
+        7. Click 'login' button
+        8. Verify error 'Your email or password is incorrect!' is visible
+        */
+        const invalidRegistrationData = new RegistrationFormDataBuilder()
+            .build()
+        await expect.soft(homePage.automationExcerciseHeading).toBeVisible();
+        await navigationBar.signupLoginButton.click();
+        await expect.soft(loginPage.loginYourAccountHeader).toBeVisible();
+        await loginPage.login(invalidRegistrationData);
+        await expect(loginPage.loginIncorrectCredentials).toBeVisible();
+    });
+
+
+    test('Test Case 4: Logout user', {
+        annotation: {
+            type: "userstory",
+            description: "https://link.in.jira.net/browse/AE-004",
+        }
+    }, async ({homePage, loginPage, navigationBar, apiClient}) => {
+        /*
+        Steps
+        1.  Launch browser
+        2.  Navigate to url {{base_url}}
+        3.  Verify that home page is visible successfully
+        4.  Click on 'Signup / Login' button
+        5.  Verify 'Login to your account' is visible
+        6.  Enter correct email address and password
+        7.  Click 'login' button
+        8.  Verify that 'Logged in as username' is visible
+        9.  Click 'Logout' button
+        10. Verify that user is navigated to login page
+        */
+        await test.step('Arrange', async () => {
+            const response = await apiClient.createAccount(validRegistrationData);
+            verifyResponse(response, 201, 'User created!')
+        });
+
+        await test.step('Act', async () => {
+            await expect.soft(homePage.automationExcerciseHeading).toBeVisible();
+            await navigationBar.signupLoginButton.click();
+            await expect.soft(loginPage.loginYourAccountHeader).toBeVisible();
+            await loginPage.login(validRegistrationData);
+            await expect.soft(navigationBar.page.getByText(`Logged in as ${validRegistrationData.name}`)).toBeVisible();
+            await navigationBar.logoutButton.click();
+            await expect.soft(loginPage.loginYourAccountHeader).toBeVisible();
+        });
+
+        await test.step('Assert', async () => {
+            const response = await apiClient.getUserDetails(validRegistrationData)
+            verifyResponse(response, 200)
+        });
+    });
+
+
+    test('Test Case 5: Register user with existing email', {
+        annotation: {
+            type: "userstory",
+            description: "https://link.in.jira.net/browse/AE-005",
+        }
+    }, async ({homePage, loginPage, signupPage, navigationBar, apiClient}) => {
+        /*
+        Steps
+        1.  Launch browser
+        2.  Navigate to url {{base_url}}
+        3.  Verify that home page is visible successfully
+        4.  Click on 'Signup / Login' button
+        5.  Verify 'New User Signup!' is visible
+        6.  Enter name and already registered email address
+        7.  Click 'Signup' button
+        8.  Verify error 'Email Address already exist!' is visible
+        */
+        await test.step('Arrange', async () => {
+            const response = await apiClient.createAccount(validRegistrationData);
+            verifyResponse(response, 201, 'User created!')
+        });
+
+        await test.step('Act', async () => {
+            await expect.soft(homePage.automationExcerciseHeading).toBeVisible();
+            await navigationBar.signupLoginButton.click();
+            await expect.soft(loginPage.signupHeader).toBeVisible();
+            await loginPage.signup(validRegistrationData);
+        });
+
+        await test.step('Assert', async () => {
+            await expect(loginPage.signupExistingCredentials).toBeVisible();
+        });
+
     });
 
 });
 
-async function verifyStatusCode(response: APIResponse, statusCode: number): Promise<void> {
-        const json = await response.json()
-        expect(json.responseCode).toBe(statusCode)
-}
 
 
-/*
-type User = {
-    username: string;
-    password: string;
-};
-*/
-/*
- 1. In an array print the second smallest and second largest element 
- 
- 4. Given an array {1,3,3,4,5,6,6,7,8,9,9} when user enters a search element, 
-    the program should display the index number where the element is found. 
-    If the element is repeated it should display all those indices. 
-    If it is not present in the given array program should display "element not found"
 
-*/
-/*
-test("JavaScript - Tutorial", () => {
-    const formData = new RegistrationFormDataBuilder()
-           .withFirstName('John')
-           .withLastName('Doe')
-           .withEmail(process.env.EMAIL!)
-           .withPhoneNumber('555-0123')
-           .withCity('New York')
-           .withState('NY')
-           .withPassword(process.env.PASSWORD!)
-           .build();
-    /*
-    let user: User = { username: "user", password: "123456", }
-    passwordCheck(user)
-    
-    let i = 0;
-    
-});
-*/
-/*
-test("toJSON", () => {
-   const formData = new RegistrationFormDataBuilder()
-           .withFirstName('John')
-           .withLastName('Doe')
-           .withEmail('auto1.mindmanager@gmail.com')
-           .withPhoneNumber('555-0123')
-           .withCity('New York')
-           .withState('NY')
-           .withPassword('z3a!qrUD')
-           .toJSON();
-    let i = 0;
-});
-
-function passwordCheck(user: User) {
-    if (user.password = "123456"){
-        let randomPassword = Math.random().toString(36).slice(-16)
-        user.password = randomPassword
-    }
-}
-
-function createUser(username: string, password: string): User {
-    const user: User = { username, password }
-    return user
-}
-*/

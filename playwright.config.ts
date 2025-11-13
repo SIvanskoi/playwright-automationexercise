@@ -8,6 +8,7 @@ import dotenv from 'dotenv';
 import path from 'path';
 dotenv.config({ path: path.resolve(__dirname, '.env') });
 
+const isCI = process.env.CI === 'true';
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
@@ -41,7 +42,7 @@ export default defineConfig({
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
 
-    headless: false,
+    headless: isCI,
     viewport: { width: 1920, height: 1080 },
     //ignoreHTTPSErrors: true,
     video: 'on-first-retry',

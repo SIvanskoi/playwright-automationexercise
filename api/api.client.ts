@@ -1,4 +1,4 @@
-import { APIRequestContext, APIResponse} from '@playwright/test';
+import { APIRequestContext, APIResponse, expect} from '@playwright/test';
 import { RegistrationFormData } from '../utils/fakeuser'
 
 export class ApiClient {
@@ -64,6 +64,7 @@ export class ApiClient {
         });
     }
 
+
     async createAccount(formData: Partial<RegistrationFormData>): Promise<APIResponse> {
         return await this.post('/api/createAccount', formData)
     }
@@ -76,4 +77,63 @@ export class ApiClient {
         return await this.get('/api/getUserDetailByEmail', { 'email' : formData.email })    
     }
 
+    /* ------------------ AI generated ----------------------------------------------------
+    That method is a compact and elegant way to safely access deeply nested values in an object using a dot-separated string path. 
+    
+    ✅ path.split('.')
+        - Converts a string like "user.address.city" into an array:
+        ["user", "address", "city"]
+
+    ✅ .reduce((current, key) => current?.[key], obj)
+        - Iteratively walks through the object using each key.
+        - current?.[key] uses optional chaining to avoid errors if a property is missing.
+        - Starts with the original object obj, and drills down step-by-step.
+
+    🧪 Example Usage
+        const data = {
+            user: {
+                address: {
+                    city: "Kharkiv"
+                }
+            }
+        };
+
+        const city = getNestedValue(data, "user.address.city");
+        console.log(city); // "Kharkiv"
+
+
+        If any part of the path is missing (e.g., address is undefined), it safely returns undefined instead of throwing an error.
+    
+    /**
+    * Verify response contains field
+    
+    async verifyJsonField(fieldPath: string, expectedValue?: any): Promise<void> {
+        const json = await this.json();
+        const value = this.getNestedValue(json, fieldPath);
+    
+        if (expectedValue !== undefined) {
+            expect(value).toBe(expectedValue);
+        } else {
+            expect(value).toBeDefined();
+        }
+    }
+
+    /**
+    * Get nested value from object
+   
+    private getNestedValue(obj: any, path: string): any {
+        return path.split('.').reduce((current, key) => current?.[key], obj);
+    }
+    ------------------ AI generated ---------------------------------------------------- */
+
+}
+
+export async function verifyResponse(response: APIResponse, statusCode?: number, message?: string): Promise<void> {
+    const json = await response.json()
+    if (statusCode) {
+        expect(json.responseCode).toBe(statusCode)
+    }
+    if (message) {
+        expect(json.message).toBe(message)
+    }
 }

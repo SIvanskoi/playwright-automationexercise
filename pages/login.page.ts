@@ -9,12 +9,14 @@ export class LoginPage extends BasePage {
     readonly loginPasswordInput: Locator;
     readonly loginButton: Locator;
     readonly loginYourAccountHeader: Locator;
+    readonly loginIncorrectCredentials: Locator;
 
     // Signup Form Elements
     readonly signupHeader: Locator;
     readonly signupNameInput: Locator;
     readonly signupEmailInput: Locator;
     readonly signupButton: Locator;
+    readonly signupExistingCredentials: Locator;
 
     readonly title: RegExp;
 
@@ -28,12 +30,14 @@ export class LoginPage extends BasePage {
         this.loginPasswordInput = this.page.getByTestId('login-password');
         this.loginButton = this.page.getByTestId('login-button');
         this.loginYourAccountHeader = this.page.getByRole('heading', { name: 'Login to your account', exact: true })
+        this.loginIncorrectCredentials = this.page.getByText('Your email or password is incorrect!', { exact: true })
 
         // Signup form locators
         this.signupHeader = this.page.getByRole('heading', { name: 'New User Signup!', exact: true })
         this.signupNameInput = this.page.getByTestId('signup-name');
         this.signupEmailInput = this.page.getByTestId('signup-email');
         this.signupButton = this.page.getByTestId('signup-button');
+        this.signupExistingCredentials = this.page.getByText('Email Address already exist!')
 
         this.title = /Signup \/ Login/
         
