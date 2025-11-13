@@ -1,4 +1,5 @@
 .env
+tests/example.spec.ts
 
 # Playwright
 node_modules/
