@@ -271,6 +271,75 @@ test.describe('Automation Exercise - E2E - Pages', () => {
 
     });
 
+    test('Test Case 7: Verify Test Cases Page', {
+        annotation: {
+            type: "userstory",
+            description: "https://link.in.jira.net/browse/AE-007",
+        }
+    }, async ({homePage, navigationBar, testcasesPage}) => {
+        /*
+        Steps
+        1. Launch browser
+        2. Navigate to url {{base_url}}
+        3. Verify that home page is visible successfully
+        4. Click on 'Test Cases' button
+        5. Verify user is navigated to test cases page successfully
+        */
+        await expect.soft(homePage.automationExcerciseHeading).toBeVisible();
+        await navigationBar.testCasesButton.click()
+        const count = await testcasesPage.testcaseHeading.count()
+        expect(count).toBe(26)        
+    });
+
+
+    test('Test Case 10: Verify Subscription in Home page', {
+        annotation: {
+            type: "userstory",
+            description: "https://link.in.jira.net/browse/AE-010",
+        }
+    }, async ({homePage, footer}) => {
+        /*
+        Steps
+        1. Launch browser
+        2. Navigate to url {{base_url}}
+        3. Verify that home page is visible successfully
+        4. Scroll down to footer
+        5. Verify text 'SUBSCRIPTION'
+        6. Enter email address in input and click arrow button
+        7. Verify success message 'You have been successfully subscribed!' is visible
+        */
+        await expect.soft(homePage.automationExcerciseHeading).toBeVisible();
+        await expect.soft(footer.subscriptionHeading).toBeVisible()
+        await footer.emailInput.fill(validRegistrationData.email!)
+        await footer.submitButton.click()
+        await expect(footer.subscibeSuccess).toBeVisible()
+    });
+
+    test('Test Case 11: Verify Subscription in Cart page', {
+        annotation: {
+            type: "userstory",
+            description: "https://link.in.jira.net/browse/AE-011",
+        }
+    }, async ({homePage, footer, navigationBar}) => {
+        /*
+        Steps
+        1. Launch browser
+        2. Navigate to url {{base_url}}
+        3. Verify that home page is visible successfully
+        4. Click 'Cart' button
+        5. Scroll down to footer
+        6. Verify text 'SUBSCRIPTION'
+        7. Enter email address in input and click arrow button
+        8. Verify success message 'You have been successfully subscribed!' is visible
+        */
+        await expect.soft(homePage.automationExcerciseHeading).toBeVisible();
+        await navigationBar.cartButton.click()
+        await expect.soft(footer.subscriptionHeading).toBeVisible()
+        await footer.emailInput.fill(validRegistrationData.email!)
+        await footer.submitButton.click()
+        await expect(footer.subscibeSuccess).toBeVisible()
+    });
+
 
 });
 

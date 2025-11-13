@@ -5,6 +5,8 @@ import { NavigationBar } from '../pages/navbar'
 import { HomePage } from '../pages/home.page';
 import { ApiClient } from '../api/api.client';
 import { ContactUsPage } from '../pages/contactus.page';
+import { TestCasesPage } from '../pages/testcases.page';
+import { Footer } from '../pages/footer';
 
 type Fixtures = {
     apiClient: ApiClient;
@@ -13,6 +15,8 @@ type Fixtures = {
     navigationBar: NavigationBar;
     signupPage: SignupPage;
     contactUsPage: ContactUsPage;
+    testcasesPage: TestCasesPage;
+    footer: Footer;
 };
 
 export const test = base.extend<Fixtures>({
@@ -39,6 +43,14 @@ export const test = base.extend<Fixtures>({
 
     signupPage: async ({page}, use) => {
         await use(new SignupPage(page));        
+    },
+
+    testcasesPage: async ({ page }, use) => {
+        await use(new TestCasesPage(page));
+    },
+
+    footer: async ({ page }, use) => {
+        await use(new Footer(page));
     },
 
 });
