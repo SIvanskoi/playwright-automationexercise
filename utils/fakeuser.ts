@@ -58,6 +58,7 @@ export class RegistrationFormDataBuilder {
         this.data.country = this.countryProvider.getCountry();
         this.data.company = faker.company.name();
         this.data.password = faker.string.alphanumeric(12);
+        this.data.name = `${this.data.firstname} ${this.data.lastname}`.trim()
     }
 
     withFirstName(firstName: string): this {
@@ -207,7 +208,6 @@ export class RegistrationFormDataBuilder {
     }
 
     build(): Partial<RegistrationFormData> {
-        this.data.name = `${this.data.firstname} ${this.data.lastname}`
         return { ...this.data };
     }
 

@@ -12,6 +12,9 @@ const validRegistrationData = new RegistrationFormDataBuilder()
     .build()
 
 
+test.use({ viewport: { width: 1920, height: 1080 } });
+
+
 test.beforeEach(async ({homePage}) => {
         await homePage.open();
     });
@@ -257,9 +260,9 @@ test.describe('Automation Exercise - E2E - Pages', () => {
             await expect.soft(homePage.automationExcerciseHeading).toBeVisible();
             await navigationBar.contactUsButton.click();
             await expect(contactUsPage.getInTouchHeading).toBeVisible();
-            await contactUsPage.submitContactUsForm(validRegistrationData, message, message, filePath)
-            await expect.soft(contactUsPage.submitStatus).toBeVisible()
-            await contactUsPage.homeButton.click()
+            await contactUsPage.submitContactUsForm(validRegistrationData, message, message, filePath);
+            await expect.soft(contactUsPage.submitStatus).toBeVisible();
+            await contactUsPage.homeButton.click();
         });
 
         await test.step('Assert', async () => {
@@ -267,6 +270,7 @@ test.describe('Automation Exercise - E2E - Pages', () => {
         });
 
     });
+
 
     test('Test Case 7: Verify Test Cases Page', {
         annotation: {
@@ -283,9 +287,44 @@ test.describe('Automation Exercise - E2E - Pages', () => {
         5. Verify user is navigated to test cases page successfully
         */
         await expect.soft(homePage.automationExcerciseHeading).toBeVisible();
-        await navigationBar.testCasesButton.click()
-        const count = await testcasesPage.testcaseHeading.count()
-        expect(count).toBe(26)        
+        await navigationBar.testCasesButton.click();
+        const count = await testcasesPage.testcaseHeading.count();
+        expect(count).toBe(26);
+    });
+
+
+    test('Test Case 8: Verify All Products and product details page', {
+        annotation: {
+            type: "userstory",
+            description: "https://link.in.jira.net/browse/AE-008",
+        }
+    }, async ({homePage, navigationBar, productsPage}) => {
+        /*
+        Steps
+        1. Launch browser
+        2. Navigate to url {{base_url}}
+        3. Verify that home page is visible successfully
+        4. Click on 'Products' button
+        5. Verify user is navigated to ALL PRODUCTS page successfully
+        6. The products list is visible
+        7. Click on 'View Product' of first product
+        8. User is landed to product detail page
+        9. Verify that detail detail is visible: product name, category, price, availability, condition, brand
+        */
+        await test.step('Act', async () => {
+            await expect.soft(homePage.automationExcerciseHeading).toBeVisible();
+            navigationBar.productsButton.click();
+            await expect.soft(productsPage.allProductsHeading).toBeVisible();
+        });
+        
+        await test.step('Assert', async () => {
+            const product_details = await productsPage.viewProductByIndex(0);
+            expect.soft(product_details.productAvailability).toContainText('In Stock');
+            expect.soft(product_details.productBrand).toContainText('Polo');
+            expect.soft(product_details.productCategory).toContainText('Women > Tops');
+            expect.soft(product_details.productName).toContainText('Blue Top');
+            expect.soft(product_details.productPrice).toContainText('Rs. 500')
+        });
     });
 
 
@@ -306,10 +345,10 @@ test.describe('Automation Exercise - E2E - Pages', () => {
         7. Verify success message 'You have been successfully subscribed!' is visible
         */
         await expect.soft(homePage.automationExcerciseHeading).toBeVisible();
-        await expect.soft(footer.subscriptionHeading).toBeVisible()
-        await footer.emailInput.fill(validRegistrationData.email!)
-        await footer.submitButton.click()
-        await expect(footer.subscibeSuccess).toBeVisible()
+        await expect.soft(footer.subscriptionHeading).toBeVisible();
+        await footer.emailInput.fill(validRegistrationData.email!);
+        await footer.submitButton.click();
+        await expect(footer.subscibeSuccess).toBeVisible();
     });
 
     test('Test Case 11: Verify Subscription in Cart page', {
@@ -330,11 +369,11 @@ test.describe('Automation Exercise - E2E - Pages', () => {
         8. Verify success message 'You have been successfully subscribed!' is visible
         */
         await expect.soft(homePage.automationExcerciseHeading).toBeVisible();
-        await navigationBar.cartButton.click()
-        await expect.soft(footer.subscriptionHeading).toBeVisible()
-        await footer.emailInput.fill(validRegistrationData.email!)
+        await navigationBar.cartButton.click();
+        await expect.soft(footer.subscriptionHeading).toBeVisible();
+        await footer.emailInput.fill(validRegistrationData.email!);
         await footer.submitButton.click()
-        await expect(footer.subscibeSuccess).toBeVisible()
+        await expect(footer.subscibeSuccess).toBeVisible();
     });
 
 
