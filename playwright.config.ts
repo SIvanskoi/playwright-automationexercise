@@ -43,7 +43,6 @@ export default defineConfig({
     trace: 'on-first-retry',
 
     headless: isCI,
-    viewport: { width: 1920, height: 1080 },
     //ignoreHTTPSErrors: true,
     video: 'on-first-retry',
     screenshot: 'only-on-failure',
@@ -81,7 +80,9 @@ export default defineConfig({
     /* Test against branded browsers. */
      {
        name: 'Microsoft Edge',
-       use: { ...devices['Desktop Edge'], channel: 'msedge' },
+       use: { ...devices['Desktop Edge'], 
+       channel: 'msedge',
+       viewport: { width: 1920, height: 1080 }, },
      },
     // {
     //   name: 'Google Chrome',

@@ -60,7 +60,7 @@ export class SignupPage extends BasePage {
         this.accountCreatedHeader = this.page.getByText('Account Created!');
     }
 
-    async createAccount(formData: Partial<RegistrationFormData>): Promise<void> {
+    public async createAccount(formData: Partial<RegistrationFormData>): Promise<void> {
         if (formData.name) {
             await this.nameInput.fill(formData.name);
         }

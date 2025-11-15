@@ -11,10 +11,7 @@ const validRegistrationData = new RegistrationFormDataBuilder()
     .withPassword(process.env.AE_PASSWORD!)
     .build()
 
-
-test.use({ viewport: { width: 1920, height: 1080 } });
-
-
+    
 test.beforeEach(async ({homePage}) => {
         await homePage.open();
     });
@@ -293,41 +290,6 @@ test.describe('Automation Exercise - E2E - Pages', () => {
     });
 
 
-    test('Test Case 8: Verify All Products and product details page', {
-        annotation: {
-            type: "userstory",
-            description: "https://link.in.jira.net/browse/AE-008",
-        }
-    }, async ({homePage, navigationBar, productsPage}) => {
-        /*
-        Steps
-        1. Launch browser
-        2. Navigate to url {{base_url}}
-        3. Verify that home page is visible successfully
-        4. Click on 'Products' button
-        5. Verify user is navigated to ALL PRODUCTS page successfully
-        6. The products list is visible
-        7. Click on 'View Product' of first product
-        8. User is landed to product detail page
-        9. Verify that detail detail is visible: product name, category, price, availability, condition, brand
-        */
-        await test.step('Act', async () => {
-            await expect.soft(homePage.automationExcerciseHeading).toBeVisible();
-            navigationBar.productsButton.click();
-            await expect.soft(productsPage.allProductsHeading).toBeVisible();
-        });
-        
-        await test.step('Assert', async () => {
-            const product_details = await productsPage.viewProductByIndex(0);
-            expect.soft(product_details.productAvailability).toContainText('In Stock');
-            expect.soft(product_details.productBrand).toContainText('Polo');
-            expect.soft(product_details.productCategory).toContainText('Women > Tops');
-            expect.soft(product_details.productName).toContainText('Blue Top');
-            expect.soft(product_details.productPrice).toContainText('Rs. 500')
-        });
-    });
-
-
     test('Test Case 10: Verify Subscription in Home page', {
         annotation: {
             type: "userstory",
@@ -374,6 +336,120 @@ test.describe('Automation Exercise - E2E - Pages', () => {
         await footer.emailInput.fill(validRegistrationData.email!);
         await footer.submitButton.click()
         await expect(footer.subscibeSuccess).toBeVisible();
+    });
+
+});
+
+test.describe('Automation Exercise - E2E - Product', () => {
+
+    test('Test Case 8: Verify All Products and product details page', {
+        annotation: {
+            type: "userstory",
+            description: "https://link.in.jira.net/browse/AE-008",
+        }
+    }, async ({homePage, navigationBar, productsPage}) => {
+        /*
+        Steps
+        1. Launch browser
+        2. Navigate to url {{base_url}}
+        3. Verify that home page is visible successfully
+        4. Click on 'Products' button
+        5. Verify user is navigated to ALL PRODUCTS page successfully
+        6. The products list is visible
+        7. Click on 'View Product' of first product
+        8. User is landed to product detail page
+        9. Verify that detail detail is visible: product name, category, price, availability, condition, brand
+        */
+        await test.step('Act', async () => {
+            await expect.soft(homePage.automationExcerciseHeading).toBeVisible();
+            await navigationBar.productsButton.click();
+            await expect.soft(productsPage.allProductsHeading).toBeVisible();
+        });
+        
+        await test.step('Assert', async () => {
+            const productCard = await productsPage.getProductCardByIndex(0)
+            const productDetails = await productCard.viewProduct()
+
+            expect.soft(productDetails.productAvailability).toContainText('In Stock');
+            expect.soft(productDetails.productBrand).toContainText('Polo');
+            expect.soft(productDetails.productCategory).toContainText('Women > Tops');
+            expect.soft(productDetails.productName).toContainText('Blue Top');
+            expect.soft(productDetails.productPrice).toContainText('Rs. 500');
+        });
+    });
+
+    test('Test Case 9: Search Product', {
+        annotation: {
+            type: "userstory",
+            description: "https://link.in.jira.net/browse/AE-009",
+        }
+    }, async ({homePage, navigationBar, productsPage}) => {
+        /*
+        Steps
+        1. Launch browser
+        2. Navigate to url {{base_url}}
+        3. Verify that home page is visible successfully
+        4. Click on 'Products' button
+        5. Verify user is navigated to ALL PRODUCTS page successfully
+        6. Enter product name in search input and click search button
+        7. Verify 'SEARCHED PRODUCTS' is visible
+        8. Verify all the products related to search are visible
+        */
+        await test.step('Act', async () => {
+            await expect.soft(homePage.automationExcerciseHeading).toBeVisible();
+            await navigationBar.productsButton.click();
+            await expect.soft(productsPage.allProductsHeading).toBeVisible();
+            await productsPage.searchProduct('dress')
+        });
+
+        await test.step('Assert', async () => {
+            const cardCollection = await productsPage.getAllProductCards();
+            expect.soft(cardCollection.length).toBe(9);
+            for (const card of cardCollection) {
+                await expect.soft(card.productInfo, `Product ${card.getName()} is not visible`).toBeVisible()
+            } 
+        });
+    });
+
+
+    test('Test Case 12: Add Products in Cart', {
+        annotation: {
+            type: "userstory",
+            description: "https://link.in.jira.net/browse/AE-012",
+        }
+    }, async ({homePage, navigationBar, productsPage, cartPage}) => {
+        /*
+        Steps
+        1.  Launch browser
+        2.  Navigate to url {{base_url}}
+        3.  Verify that home page is visible successfully
+        4.  Click on 'Products' button
+        5.  Hover over first product and click 'Add to cart'
+        6.  Click 'Continue Shopping' button
+        7.  Hover over second product and click 'Add to cart'
+        8.  Click 'View Cart' button
+        9.  Verify both products are added to Cart
+        10. Verify their prices, quantity and total price
+        */
+       await test.step('Add products in cart', async () => {
+            await expect.soft(homePage.automationExcerciseHeading).toBeVisible();
+            await navigationBar.productsButton.click();
+            await expect.soft(productsPage.allProductsHeading).toBeVisible();
+            const card0 = await productsPage.getProductCardByIndex(0)
+            await card0.addToCartFromOverlay()
+            await productsPage.continueShoppingFromCartModal()
+            const card1 = await productsPage.getProductCardByIndex(1)
+            await card1.addToCartFromOverlay()
+            await productsPage.viewCartFromCartModal()
+        });
+
+        await test.step('Verify cart', async () => {
+            const expectedCart = [
+                ['Blue Top', 'Rs. 500', '1', 'Rs. 500'],
+                ['Men Tshirt', 'Rs. 400', '1', 'Rs. 400']
+            ];
+            cartPage.verifyCart(expectedCart)
+        });
     });
 
 

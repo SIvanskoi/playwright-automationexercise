@@ -8,6 +8,7 @@ import { ContactUsPage } from '../pages/contactus.page';
 import { TestCasesPage } from '../pages/testcases.page';
 import { Footer } from '../pages/footer';
 import { ProductsPage } from '../pages/products.page';
+import { CartPage } from '../pages/cart.page';
 
 type Fixtures = {
     apiClient: ApiClient;
@@ -19,6 +20,7 @@ type Fixtures = {
     testcasesPage: TestCasesPage;
     footer: Footer;
     productsPage: ProductsPage;
+    cartPage: CartPage;
 };
 
 export const test = base.extend<Fixtures>({
@@ -57,7 +59,11 @@ export const test = base.extend<Fixtures>({
 
     productsPage: async ({page}, use) => {
         await use(new ProductsPage(page));
-    },   
+    },
+
+    cartPage: async ({page}, use) => {
+        await use(new CartPage(page));
+    }, 
 
 });
 
