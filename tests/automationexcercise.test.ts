@@ -1,5 +1,6 @@
 import { test, expect } from '../fixtures/fixtures';
 import { RegistrationFormDataBuilder} from '../utils/fakeuser';
+import { PaymentDataBuilder } from '../utils/fakecard';
 import { verifyResponse } from '../api/api.client'
 import path from 'path';
 import fs from 'fs';
@@ -342,6 +343,11 @@ test.describe('Automation Exercise - E2E - Pages', () => {
 
 test.describe('Automation Exercise - E2E - Product', () => {
 
+    // Delete existing account after each test
+    test.afterEach(async ({ apiClient }) => {
+        await apiClient.deleteAccount(validRegistrationData);        
+    });
+
     test('Test Case 8: Verify All Products and product details page', {
         annotation: {
             type: "userstory",
@@ -406,7 +412,7 @@ test.describe('Automation Exercise - E2E - Product', () => {
             const cardCollection = await productsPage.getAllProductCards();
             expect.soft(cardCollection.length).toBe(9);
             for (const card of cardCollection) {
-                await expect.soft(card.productInfo, `Product ${card.getName()} is not visible`).toBeVisible()
+                await expect.soft(card.productInfo, `Product ${card.getName()} is not visible`).toBeVisible();
             } 
         });
     });
@@ -431,16 +437,16 @@ test.describe('Automation Exercise - E2E - Product', () => {
         9.  Verify both products are added to Cart
         10. Verify their prices, quantity and total price
         */
-       await test.step('Add products in cart', async () => {
+        await test.step('Add products in cart', async () => {
             await expect.soft(homePage.automationExcerciseHeading).toBeVisible();
             await navigationBar.productsButton.click();
             await expect.soft(productsPage.allProductsHeading).toBeVisible();
-            const card0 = await productsPage.getProductCardByIndex(0)
-            await card0.addToCartFromOverlay()
-            await productsPage.continueShoppingFromCartModal()
-            const card1 = await productsPage.getProductCardByIndex(1)
-            await card1.addToCartFromOverlay()
-            await productsPage.viewCartFromCartModal()
+            const card0 = await productsPage.getProductCardByIndex(0);
+            await card0.addToCartFromOverlay();
+            await productsPage.continueShoppingFromCartModal();
+            const card1 = await productsPage.getProductCardByIndex(1);
+            await card1.addToCartFromOverlay();
+            await productsPage.viewCartFromCartModal();
         });
 
         await test.step('Verify cart', async () => {
@@ -448,9 +454,158 @@ test.describe('Automation Exercise - E2E - Product', () => {
                 ['Blue Top', 'Rs. 500', '1', 'Rs. 500'],
                 ['Men Tshirt', 'Rs. 400', '1', 'Rs. 400']
             ];
-            cartPage.verifyCart(expectedCart)
+            await cartPage.verifyCart(expectedCart);
         });
     });
+
+    test('Test Case 13: Verify Product quantity in Cart', {
+        annotation: {
+            type: "userstory",
+            description: "https://link.in.jira.net/browse/AE-012",
+        }
+    }, async ({homePage, productsPage, cartPage}) => {
+        /*
+        Steps
+        1. Launch browser
+        2. Navigate to url {{base_url}}
+        3. Verify that home page is visible successfully
+        4. Click 'View Product' for any product on home page
+        5. Verify product detail is opened
+        6. Increase quantity to 4
+        7. Click 'Add to cart' button
+        8. Click 'View Cart' button
+        9. Verify that product is displayed in cart page with exact quantity
+        */
+        await test.step('Add products in cart', async () => {
+            await expect.soft(homePage.automationExcerciseHeading).toBeVisible();
+            const card = await productsPage.getProductCardByIndex(0);
+            const productDetails = await card.viewProduct();
+            await productDetails.addToCart('4');
+            await productsPage.viewCartFromCartModal();
+        });
+
+        await test.step('Verify cart', async () => {
+            const expectedCart = [
+                ['Blue Top', 'Rs. 500', '4', 'Rs. 2000']
+            ];
+            await cartPage.verifyCart(expectedCart);
+        });
+
+    });
+
+    test('Test Case 14: Place Order: Register while Checkout', {
+        annotation: {
+            type: "userstory",
+            description: "https://link.in.jira.net/browse/AE-014",
+        }
+    }, async ({homePage, productsPage, navigationBar, cartPage, loginPage, signupPage}) => {
+        /*
+        Steps
+        1.  Launch browser
+        2.  Navigate to url {{base_url}}
+        3.  Verify that home page is visible successfully
+        4.  Add products to cart
+        5.  Click 'Cart' button
+        6.  Verify that cart page is displayed
+        7.  Click Proceed To Checkout
+        8.  Click 'Register / Login' button
+        9.  Fill all details in Signup and create account
+        10. Verify 'ACCOUNT CREATED!' and click 'Continue' button
+        11. Verify 'Logged in as username' at top
+        12. Click 'Cart' button
+        13. Click 'Proceed To Checkout' button
+        14. Verify Address Details and Review Your Order
+        15. Enter description in comment text area and click 'Place Order'
+        16. Enter payment details: Name on Card, Card Number, CVC, Expiration date
+        17. Click 'Pay and Confirm Order' button
+        18. Verify success message 'Your order has been placed successfully!'
+        19. Click 'Delete Account' button
+        20. Verify 'ACCOUNT DELETED!' and click 'Continue' button
+        */
+        await test.step('Add products in cart', async () => {
+            await expect.soft(homePage.automationExcerciseHeading).toBeVisible();
+            const card0 = await productsPage.getProductCardByIndex(0);
+            await card0.addToCart();
+            await productsPage.continueShoppingFromCartModal();
+            const card1 = await productsPage.getProductCardByIndex(1);
+            await card1.addToCart();
+            await productsPage.continueShoppingFromCartModal();
+            await navigationBar.cartButton.click();
+            await cartPage.proceedToCheckoutButton.click()
+            await cartPage.registerLoginLink.click()
+        });
+
+        await test.step('Register and login', async () => {
+            await loginPage.signup(validRegistrationData);
+            await signupPage.createAccount(validRegistrationData);
+            await expect.soft(signupPage.accountCreatedHeader).toBeVisible();
+            await signupPage.continueButton.click();
+            await expect.soft(navigationBar.page.getByText(`Logged in as ${validRegistrationData.name}`)).toBeVisible();
+        });
+
+        await test.step('Place order', async () => {
+            const paymentData = new PaymentDataBuilder()
+                .withCardName(validRegistrationData.name!)
+                .build();
+
+            await navigationBar.cartButton.click();
+            await cartPage.proceedToCheckoutButton.click();
+            //await cartPage.verifyBillingAddress(validRegistrationData);
+            await cartPage.verifyDeliveryAddress(validRegistrationData);
+            await cartPage.commentInput.fill('new comment');
+            await cartPage.placeOrderLink.click();
+            await cartPage.fillPaymentDataAndConfitmOrder(paymentData);
+            await expect.soft(cartPage.orderSuccessfulText).toBeVisible();
+        });
+
+        await test.step('Delete account', async () => {
+            await navigationBar.deleteAccountButton.click();
+            await expect.soft(signupPage.accountDeletedHeader).toBeVisible();
+            await signupPage.continueButton.click();
+        });
+
+    });
+
+    test('Test Case 17: Remove Products From Cart', {
+        annotation: {
+            type: "userstory",
+            description: "https://link.in.jira.net/browse/AE-017",
+        }
+    }, async ({homePage, productsPage, navigationBar, cartPage}) => {
+        /*
+        Steps
+        1. Launch browser
+        2. Navigate to url {{base_url}}
+        3. Verify that home page is visible successfully
+        4. Add products to cart
+        5. Click 'Cart' button
+        6. Verify that cart page is displayed
+        7. Click 'X' button corresponding to particular product
+        8. Verify that product is removed from the cart
+        */
+        await test.step('Add products in cart', async () => {
+            await expect.soft(homePage.automationExcerciseHeading).toBeVisible();
+            const card0 = await productsPage.getProductCardByIndex(0);
+            await card0.addToCart();
+            await productsPage.continueShoppingFromCartModal();
+            const card1 = await productsPage.getProductCardByIndex(1);
+            await card1.addToCart();
+            await productsPage.continueShoppingFromCartModal();
+        });
+
+        await test.step('Remove particular product from cart', async () => {
+            await navigationBar.cartButton.click();
+            await cartPage.deleteProductByIndex(1);
+        });
+
+        await test.step('Verify cart', async () => {
+            const expectedCart = [
+                ['Blue Top', 'Rs. 500', '1', 'Rs. 500']
+            ];
+            await cartPage.verifyCart(expectedCart);
+        });
+    });
+
 
 
 });

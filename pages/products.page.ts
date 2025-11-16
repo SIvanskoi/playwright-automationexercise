@@ -18,8 +18,8 @@ export class ProductsPage extends BasePage {
         this.allProductsHeading = this.page.getByRole('heading', { name: 'All Products' })
         this.searchProductInput = this.page.locator('//input[@id="search_product"]')
         this.searchButton = this.page.locator('//button[@id="submit_search"]')
-        this.cartModal = page.locator('#cartModal');
-        this.productCard = page.locator('//div[@class="product-image-wrapper"]')
+        this.cartModal = this.page.locator('#cartModal');
+        this.productCard = this.page.locator('//div[@class="product-image-wrapper"]')
     }
 
     public async continueShoppingFromCartModal(): Promise<void> {
