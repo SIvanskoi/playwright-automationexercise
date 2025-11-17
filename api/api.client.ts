@@ -5,10 +5,27 @@ export class ApiClient {
 
     private request: APIRequestContext;
     private defaultContentType: string;
+    readonly endpointProductsList: string;
+    readonly endpointGetUserByEmail: string;
+    readonly endpointCreateAccount: string;
+    readonly endpointDeleteAccount: string;
+    readonly endpointBrandsList: string;
+    readonly endpointSearchProduct: string;
+    readonly endpointVerifyLogin: string;
+    readonly endpointUpdateAccount: string;
 
     constructor(request: APIRequestContext) {
         this.request = request;
         this.defaultContentType = 'application/x-www-form-urlencoded';
+
+        this.endpointProductsList = '/api/productsList';
+        this.endpointGetUserByEmail = '/api/getUserDetailByEmail';
+        this.endpointCreateAccount = '/api/createAccount';
+        this.endpointDeleteAccount = '/api/deleteAccount';
+        this.endpointBrandsList = '/api/brandsList';
+        this.endpointSearchProduct = '/api/searchProduct';
+        this.endpointVerifyLogin = '/api/verifyLogin';
+        this.endpointUpdateAccount = '/api/updateAccount'
     }
 
     /**
@@ -16,11 +33,12 @@ export class ApiClient {
     */
     private toFormUrlEncoded(data: Record<string, any>): string {
         return Object.keys(data)
+        .filter(key => data[key] !== undefined)
         .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(data[key])}`)
         .join('&');
     }
 
-    private async post(endpoint: string, data: Record<string, any>, options?: { headers?: Record<string, string>; }): Promise<APIResponse> {
+    public async post(endpoint: string, data: Record<string, any>, options?: { headers?: Record<string, string>; }): Promise<APIResponse> {
         const payload = this.toFormUrlEncoded(data);
     
         return await this.request.post(endpoint, {
@@ -32,7 +50,7 @@ export class ApiClient {
         });
     }
 
-    private async get(endpoint: string, params?: Record<string, any>, options?: { headers?: Record<string, string>; }): Promise<APIResponse> {
+    public async get(endpoint: string, params?: Record<string, any>, options?: { headers?: Record<string, string>; }): Promise<APIResponse> {
         const url = params ? `${endpoint}?${this.toFormUrlEncoded(params)}` : endpoint;
 
         return await this.request.get(url, {
@@ -40,7 +58,7 @@ export class ApiClient {
         });
     }
 
-    private async put(endpoint: string, data: Record<string, any>, options?: { headers?: Record<string, string>; }): Promise<APIResponse> {
+    public async put(endpoint: string, data: Record<string, any>, options?: { headers?: Record<string, string>; }): Promise<APIResponse> {
         const payload = this.toFormUrlEncoded(data);
     
         return await this.request.put(endpoint, {
@@ -52,7 +70,7 @@ export class ApiClient {
         });
     }
 
-    private async delete(endpoint: string, data: Record<string, any>, options?: { headers?: Record<string, string>;  }): Promise<APIResponse> {
+    public async delete(endpoint: string, data: Record<string, any>, options?: { headers?: Record<string, string>;  }): Promise<APIResponse> {
         const payload = this.toFormUrlEncoded(data);
 
         return await this.request.delete(endpoint, {
@@ -65,16 +83,40 @@ export class ApiClient {
     }
 
 
-    async createAccount(formData: Partial<RegistrationFormData>): Promise<APIResponse> {
-        return await this.post('/api/createAccount', formData)
+    public async createAccount(formData: Partial<RegistrationFormData>): Promise<APIResponse> {
+        return await this.post(this.endpointCreateAccount, formData);
     }
 
-    async deleteAccount(formData: Partial<RegistrationFormData>): Promise<APIResponse> {
-        return await this.delete('/api/deleteAccount', { 'email' : formData.email, 'password' : formData.password })
+    public async deleteAccount(formData: Partial<RegistrationFormData>): Promise<APIResponse> {
+        return await this.delete(this.endpointDeleteAccount, { 'email' : formData.email, 'password' : formData.password })
     }
 
-    async getUserDetails(formData: Partial<RegistrationFormData>): Promise<APIResponse> {
-        return await this.get('/api/getUserDetailByEmail', { 'email' : formData.email })    
+    public async getUserDetails(formData: Partial<RegistrationFormData>): Promise<APIResponse> {
+        return await this.get(this.endpointGetUserByEmail, { 'email' : formData.email }); 
+    }
+
+    public async getBrandsList(): Promise<APIResponse> {
+        return await this.get(this.endpointBrandsList);
+    }
+
+    public async getProductsList(): Promise<APIResponse> {
+        return await this.get(this.endpointProductsList);
+    }
+
+    public async searchProduct(data: Record<string, any>): Promise <APIResponse> {
+        return await this.post(this.endpointSearchProduct, data);
+
+    }
+
+    public async updateAccount(formData: Partial<RegistrationFormData>): Promise<APIResponse> {
+        return await this.put(this.endpointUpdateAccount, formData);
+    }
+
+    public async verifyAccount(formData: Partial<RegistrationFormData>): Promise<APIResponse> {
+        return await this.post(this.endpointVerifyLogin, {
+            'email' : formData.email,
+            'password' : formData.password,
+        });
     }
 
     /* ------------------ AI generated ----------------------------------------------------
@@ -131,9 +173,9 @@ export class ApiClient {
 export async function verifyResponse(response: APIResponse, statusCode?: number, message?: string): Promise<void> {
     const json = await response.json()
     if (statusCode) {
-        expect(json.responseCode).toBe(statusCode)
+        expect(json.responseCode).toEqual(statusCode)
     }
     if (message) {
-        expect(json.message).toBe(message)
+        expect(json.message).toEqual(message)
     }
 }
