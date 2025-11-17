@@ -7,7 +7,7 @@ export class CartPage extends BasePage {
 
     private readonly tableRow: Locator;
     readonly proceedToCheckoutButton: Locator;
-    readonly registerLoginLink: Locator;
+    
     readonly contunueOnCartButton: Locator;
     readonly placeOrderLink: Locator;
     readonly commentInput: Locator;
@@ -27,7 +27,6 @@ export class CartPage extends BasePage {
 
         this.tableRow = this.page.locator('//tbody').getByRole('row');
         this.proceedToCheckoutButton = this.page.getByText('Proceed To Checkout');
-        this.registerLoginLink = this.page.getByRole('link', { name: 'Register / Login' });
         this.contunueOnCartButton = this.page.getByRole('button', { name: 'Continue On Cart' });
         this.placeOrderLink = this.page.getByRole('link', { name: 'Place Order' });
         this.commentInput = this.page.locator('textarea[name="message"]');
