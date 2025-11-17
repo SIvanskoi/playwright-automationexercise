@@ -417,7 +417,7 @@ test.describe('Automation Exercise - E2E - Product', () => {
     });
 
 
-    test('Test Case 12: Add Products in Cart', {
+    test('Test Case 12: Add Products to Cart', {
         annotation: {
             type: "userstory",
             description: "https://link.in.jira.net/browse/AE-012",
@@ -596,6 +596,79 @@ test.describe('Automation Exercise - E2E - Product', () => {
             await loginPage.signup(validRegistrationData);
             await signupPage.createAccount(validRegistrationData);
             await signupPage.continueButton.click();
+            await signupPage.navBar.verifyLoggedInAs(validRegistrationData.name!)
+        });
+
+        await test.step('Add products to cart', async () => {
+            const card0 = await productsPage.getProductCardByIndex(0);
+            await card0.addToCart();
+            await productsPage.cartModal.continueShoppingButton.click();
+            const card1 = await productsPage.getProductCardByIndex(1);
+            await card1.addToCart();
+            await productsPage.cartModal.continueShoppingButton.click();
+            await productsPage.navBar.cartButton.click();
+            await cartPage.proceedToCheckoutButton.click()
+        });
+
+        await test.step('Place order', async () => {
+            const paymentData = new PaymentDataBuilder()
+                .withCardName(validRegistrationData.name!)
+                .build();
+
+            await cartPage.navBar.cartButton.click();
+            await cartPage.proceedToCheckoutButton.click();
+            //await cartPage.verifyBillingAddress(validRegistrationData);
+            await cartPage.verifyDeliveryAddress(validRegistrationData);
+            await cartPage.commentInput.fill('new comment');
+            await cartPage.placeOrderLink.click();
+            await cartPage.fillPaymentDataAndConfitmOrder(paymentData);
+            await expect.soft(cartPage.orderSuccessfulText).toBeVisible();
+        });
+
+        await test.step('Delete account', async () => {
+            await signupPage.navBar.deleteAccountButton.click();
+            await expect.soft(signupPage.accountDeletedHeader).toBeVisible();
+            await signupPage.continueButton.click();
+        });
+
+    });
+
+
+    test('Test Case 16: Place Order: Login before Checkout', {
+        annotation: {
+            type: "userstory",
+            description: "https://link.in.jira.net/browse/AE-016",
+        }
+    }, async ({homePage, cartPage, loginPage, signupPage, productsPage, apiClient}) => {
+        /*
+        Steps
+        1.  Launch browser
+        2.  Navigate to url {{base_url}}
+        3.  Verify that home page is visible successfully
+        4.  Click 'Signup / Login' button
+        5.  Fill email, password and click 'Login' button
+        6.  Verify 'Logged in as username' at top
+        7. Add products to cart
+        8. Click 'Cart' button
+        9. Verify that cart page is displayed
+        10. Click Proceed To Checkout
+        11. Verify Address Details and Review Your Order
+        12. Enter description in comment text area and click 'Place Order'
+        13. Enter payment details: Name on Card, Card Number, CVC, Expiration date
+        14. Click 'Pay and Confirm Order' button
+        15. Verify success message 'Your order has been placed successfully!'
+        16. Click 'Delete Account' button
+        17. Verify 'ACCOUNT DELETED!' and click 'Continue' button
+        */
+        await test.step('Arrange', async () => {
+            const response = await apiClient.createAccount(validRegistrationData);
+            verifyResponse(response, 201, 'User created!')
+        });
+
+        await test.step('Login', async () => {
+            await expect.soft(homePage.automationExcerciseHeading).toBeVisible();
+            await homePage.navBar.signupLoginButton.click();
+            await loginPage.login(validRegistrationData);
             await signupPage.navBar.verifyLoggedInAs(validRegistrationData.name!)
         });
 
