@@ -1,22 +1,23 @@
 import { test as base } from '@playwright/test';
 import { LoginPage }  from '../pages/login.page';
 import { SignupPage } from '../pages/signup.page';
-import { NavigationBar } from '../pages/navbar'
 import { HomePage } from '../pages/home.page';
 import { ApiClient } from '../api/api.client';
 import { ContactUsPage } from '../pages/contactus.page';
 import { TestCasesPage } from '../pages/testcases.page';
-import { Footer } from '../pages/footer';
+import { ProductsPage, ProductDetailsPage } from '../pages/products.page';
+import { CartPage } from '../pages/cart.page';
 
 type Fixtures = {
     apiClient: ApiClient;
     homePage: HomePage;
     loginPage: LoginPage;
-    navigationBar: NavigationBar;
     signupPage: SignupPage;
     contactUsPage: ContactUsPage;
     testcasesPage: TestCasesPage;
-    footer: Footer;
+    productsPage: ProductsPage;
+    productDetailsPage: ProductDetailsPage;
+    cartPage: CartPage;
 };
 
 export const test = base.extend<Fixtures>({
@@ -37,10 +38,6 @@ export const test = base.extend<Fixtures>({
         await use(new LoginPage(page));
     },
 
-    navigationBar: async ({page}, use) => {
-        await use(new NavigationBar(page));
-    },
-
     signupPage: async ({page}, use) => {
         await use(new SignupPage(page));        
     },
@@ -49,9 +46,17 @@ export const test = base.extend<Fixtures>({
         await use(new TestCasesPage(page));
     },
 
-    footer: async ({ page }, use) => {
-        await use(new Footer(page));
+    productsPage: async ({page}, use) => {
+        await use(new ProductsPage(page));
     },
+
+    productDetailsPage: async ({page}, use) => {
+        await use(new ProductDetailsPage(page));
+    },
+
+    cartPage: async ({page}, use) => {
+        await use(new CartPage(page));
+    }, 
 
 });
 

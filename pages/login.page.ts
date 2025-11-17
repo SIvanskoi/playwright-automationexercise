@@ -43,7 +43,7 @@ export class LoginPage extends BasePage {
         
     }
 
-    async login(formData: Partial<RegistrationFormData>): Promise<void> {
+    public async login(formData: Partial<RegistrationFormData>): Promise<void> {
         if (formData.email) {
             await this.loginEmailInput.fill(formData.email);
         }
@@ -53,7 +53,7 @@ export class LoginPage extends BasePage {
         await this.loginButton.click();
     }
 
-    async signup(formData: Partial<RegistrationFormData>): Promise<void> {
+    public async signup(formData: Partial<RegistrationFormData>): Promise<void> {
         if (formData.name) {
             await this.signupNameInput.fill(formData.name);
         }
