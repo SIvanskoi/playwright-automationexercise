@@ -1,13 +1,13 @@
 import { Locator, Page } from '@playwright/test';
 import { BasePage } from './base.page';
-import { th } from '@faker-js/faker';
+import { ProductCard } from '../components/productcard';
+
 
 export class ProductsPage extends BasePage {
 
     readonly allProductsHeading: Locator;
     readonly searchProductInput: Locator;
     readonly searchButton: Locator;
-    private cartModal: Locator;
 
     private productCard: Locator;
 
@@ -18,16 +18,7 @@ export class ProductsPage extends BasePage {
         this.allProductsHeading = this.page.getByRole('heading', { name: 'All Products' })
         this.searchProductInput = this.page.locator('//input[@id="search_product"]')
         this.searchButton = this.page.locator('//button[@id="submit_search"]')
-        this.cartModal = this.page.locator('#cartModal');
         this.productCard = this.page.locator('//div[@class="product-image-wrapper"]')
-    }
-
-    public async continueShoppingFromCartModal(): Promise<void> {
-        await this.cartModal.getByRole('button', { name: 'Continue Shopping' }).click()
-    }
-
-    public async viewCartFromCartModal(): Promise<void> {
-        await this.cartModal.getByRole('link', { name: 'View Cart' }).click()
     }
 
     public async getProductCardByIndex(index: number): Promise<ProductCard> {
@@ -42,7 +33,7 @@ export class ProductsPage extends BasePage {
     
     public async getAllProductCards(productName?: string | RegExp ): Promise<ProductCard[]> {
         const collection = await this.productCard.all();
-        const cards: ProductCard[] = collection.map(locator => new ProductCard(this.page, locator));
+        const cards: ProductCard[] = collection.map(locator => new ProductCard(locator));
         /*
         if (productName) {
             
@@ -70,56 +61,7 @@ export class ProductsPage extends BasePage {
 
 }
 
-
-class ProductCard extends BasePage {
-    
-    readonly name: Locator;
-    readonly price: Locator;
-    readonly viewProductLink: Locator;
-    readonly addToCartButton: Locator;
-    readonly productInfo: Locator;
-    readonly productOverlay: Locator;
-    
-    private readonly addToCartText: string = 'Add to cart';
-
-    constructor(page: Page, readonly root: Locator) {
-        super(page)
-        this.productInfo = this.root.locator('//div[contains(@class, "productinfo")]');
-        this.name = this.productInfo.locator('p');
-        this.price = this.productInfo.locator('h2');
-        this.addToCartButton = this.productInfo.getByText(this.addToCartText);
-        this.viewProductLink = this.root.getByText('View Product');
-        this.productOverlay = this.root.locator('.product-overlay').first()
-    }
-
-    public async addToCart(): Promise<void> {
-        await this.addToCartButton.click();
-    }
-
-    public async addToCartFromOverlay(): Promise<void> {
-        const box = await this.root.boundingBox();
-        await this.page.mouse.move(box!.x + box!.width / 2, box!.y + box!.height / 2);
-        await this.productOverlay.waitFor( {state: "visible"} );
-        await this.productOverlay.getByText(this.addToCartText).click();
-    }
-
-    public async getName(): Promise<string | null> {
-        return await this.name.textContent();
-    }
-
-    public async getPrice(): Promise<string | null> {
-        return await this.price.textContent();
-    }
-
-    public async viewProduct(): Promise<ProductDetails> {
-        await this.viewProductLink.click();
-        return new ProductDetails(this.page)
-    }
-
-}
-
-
-class ProductDetails extends BasePage {
+export class ProductDetailsPage extends BasePage {
 
     readonly addToCartButton: Locator;
     readonly productInfo: Locator;

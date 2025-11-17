@@ -6,7 +6,6 @@ import path from 'path';
 import fs from 'fs';
 
 
-
 const validRegistrationData = new RegistrationFormDataBuilder()
     .withEmail(process.env.AE_EMAIL!)
     .withPassword(process.env.AE_PASSWORD!)
@@ -30,7 +29,7 @@ test.describe('Automation Exercise - E2E - Signup / Login', () => {
             type: "userstory",
             description: "https://link.in.jira.net/browse/AE-001",
         }
-    }, async ({homePage, loginPage, signupPage, navigationBar, apiClient}) => {
+    }, async ({homePage, loginPage, signupPage, apiClient}) => {
         /*
         Steps
         1.  Launch browser
@@ -55,7 +54,7 @@ test.describe('Automation Exercise - E2E - Signup / Login', () => {
         
         await test.step('Act', async () => {
             await expect.soft(homePage.automationExcerciseHeading).toBeVisible();
-            await navigationBar.signupLoginButton.click();
+            await homePage.navBar.signupLoginButton.click();
             await expect.soft(loginPage.signupHeader).toBeVisible();
             await loginPage.signup(validRegistrationData);
             await expect.soft(signupPage.enterAccountInfoHeader).toBeVisible();
@@ -64,8 +63,8 @@ test.describe('Automation Exercise - E2E - Signup / Login', () => {
             await signupPage.createAccount(validRegistrationData);
             await expect.soft(signupPage.accountCreatedHeader).toBeVisible();
             await signupPage.continueButton.click();
-            await expect.soft(navigationBar.page.getByText(`Logged in as ${validRegistrationData.name}`)).toBeVisible();
-            await navigationBar.deleteAccountButton.click();
+            await signupPage.navBar.verifyLoggedInAs(validRegistrationData.name!)
+            await signupPage.navBar.deleteAccountButton.click();
             await expect.soft(signupPage.accountDeletedHeader).toBeVisible();
             await signupPage.continueButton.click();
         });
@@ -82,7 +81,7 @@ test.describe('Automation Exercise - E2E - Signup / Login', () => {
             type: "userstory",
             description: "https://link.in.jira.net/browse/AE-002",
         }
-    }, async ({homePage, loginPage, signupPage, navigationBar, apiClient}) => {
+    }, async ({homePage, loginPage, signupPage, apiClient}) => {
         /*
         Steps
         1.  Launch browser
@@ -103,11 +102,11 @@ test.describe('Automation Exercise - E2E - Signup / Login', () => {
 
         await test.step('Act', async () => {
             await expect.soft(homePage.automationExcerciseHeading).toBeVisible();
-            await navigationBar.signupLoginButton.click();
+            await homePage.navBar.signupLoginButton.click();
             await expect.soft(loginPage.loginYourAccountHeader).toBeVisible();
             await loginPage.login(validRegistrationData);
-            await expect.soft(navigationBar.page.getByText(`Logged in as ${validRegistrationData.name}`)).toBeVisible();
-            await navigationBar.deleteAccountButton.click();
+            await signupPage.navBar.verifyLoggedInAs(validRegistrationData.name!)
+            await signupPage.navBar.deleteAccountButton.click();
             await expect.soft(signupPage.accountDeletedHeader).toBeVisible();
             await signupPage.continueButton.click();
         });
@@ -123,7 +122,7 @@ test.describe('Automation Exercise - E2E - Signup / Login', () => {
             type: "userstory",
             description: "https://link.in.jira.net/browse/AE-003",
         }
-    }, async ({homePage, loginPage, navigationBar}) => {
+    }, async ({homePage, loginPage}) => {
         /*
         Steps
         1. Launch browser
@@ -138,7 +137,7 @@ test.describe('Automation Exercise - E2E - Signup / Login', () => {
         const invalidRegistrationData = new RegistrationFormDataBuilder()
             .build()
         await expect.soft(homePage.automationExcerciseHeading).toBeVisible();
-        await navigationBar.signupLoginButton.click();
+        await homePage.navBar.signupLoginButton.click();
         await expect.soft(loginPage.loginYourAccountHeader).toBeVisible();
         await loginPage.login(invalidRegistrationData);
         await expect(loginPage.loginIncorrectCredentials).toBeVisible();
@@ -150,7 +149,7 @@ test.describe('Automation Exercise - E2E - Signup / Login', () => {
             type: "userstory",
             description: "https://link.in.jira.net/browse/AE-004",
         }
-    }, async ({homePage, loginPage, navigationBar, apiClient}) => {
+    }, async ({homePage, loginPage, apiClient}) => {
         /*
         Steps
         1.  Launch browser
@@ -171,11 +170,11 @@ test.describe('Automation Exercise - E2E - Signup / Login', () => {
 
         await test.step('Act', async () => {
             await expect.soft(homePage.automationExcerciseHeading).toBeVisible();
-            await navigationBar.signupLoginButton.click();
+            await homePage.navBar.signupLoginButton.click();
             await expect.soft(loginPage.loginYourAccountHeader).toBeVisible();
             await loginPage.login(validRegistrationData);
-            await expect.soft(navigationBar.page.getByText(`Logged in as ${validRegistrationData.name}`)).toBeVisible();
-            await navigationBar.logoutButton.click();
+            await homePage.navBar.verifyLoggedInAs(validRegistrationData.name!)
+            await homePage.navBar.logoutButton.click();
             await expect.soft(loginPage.loginYourAccountHeader).toBeVisible();
         });
 
@@ -191,7 +190,7 @@ test.describe('Automation Exercise - E2E - Signup / Login', () => {
             type: "userstory",
             description: "https://link.in.jira.net/browse/AE-005",
         }
-    }, async ({homePage, loginPage, navigationBar, apiClient}) => {
+    }, async ({homePage, loginPage, apiClient}) => {
         /*
         Steps
         1.  Launch browser
@@ -210,7 +209,7 @@ test.describe('Automation Exercise - E2E - Signup / Login', () => {
 
         await test.step('Act', async () => {
             await expect.soft(homePage.automationExcerciseHeading).toBeVisible();
-            await navigationBar.signupLoginButton.click();
+            await homePage.navBar.signupLoginButton.click();
             await expect.soft(loginPage.signupHeader).toBeVisible();
             await loginPage.signup(validRegistrationData);
         });
@@ -231,7 +230,7 @@ test.describe('Automation Exercise - E2E - Pages', () => {
             type: "userstory",
             description: "https://link.in.jira.net/browse/AE-006",
         }
-    }, async ({homePage, navigationBar, contactUsPage}) => {
+    }, async ({homePage, contactUsPage}) => {
         /*
         Steps
         1.  Launch browser
@@ -256,7 +255,7 @@ test.describe('Automation Exercise - E2E - Pages', () => {
 
         await test.step('Act', async () => {
             await expect.soft(homePage.automationExcerciseHeading).toBeVisible();
-            await navigationBar.contactUsButton.click();
+            await homePage.navBar.contactUsButton.click();
             await expect(contactUsPage.getInTouchHeading).toBeVisible();
             await contactUsPage.submitContactUsForm(validRegistrationData, message, message, filePath);
             await expect.soft(contactUsPage.submitStatus).toBeVisible();
@@ -275,7 +274,7 @@ test.describe('Automation Exercise - E2E - Pages', () => {
             type: "userstory",
             description: "https://link.in.jira.net/browse/AE-007",
         }
-    }, async ({homePage, navigationBar, testcasesPage}) => {
+    }, async ({homePage, testcasesPage}) => {
         /*
         Steps
         1. Launch browser
@@ -285,7 +284,7 @@ test.describe('Automation Exercise - E2E - Pages', () => {
         5. Verify user is navigated to test cases page successfully
         */
         await expect.soft(homePage.automationExcerciseHeading).toBeVisible();
-        await navigationBar.testCasesButton.click();
+        await homePage.navBar.testCasesButton.click();
         const count = await testcasesPage.testcaseHeading.count();
         expect(count).toBe(26);
     });
@@ -296,7 +295,7 @@ test.describe('Automation Exercise - E2E - Pages', () => {
             type: "userstory",
             description: "https://link.in.jira.net/browse/AE-010",
         }
-    }, async ({homePage, footer}) => {
+    }, async ({homePage}) => {
         /*
         Steps
         1. Launch browser
@@ -308,10 +307,10 @@ test.describe('Automation Exercise - E2E - Pages', () => {
         7. Verify success message 'You have been successfully subscribed!' is visible
         */
         await expect.soft(homePage.automationExcerciseHeading).toBeVisible();
-        await expect.soft(footer.subscriptionHeading).toBeVisible();
-        await footer.emailInput.fill(validRegistrationData.email!);
-        await footer.submitButton.click();
-        await expect(footer.subscibeSuccess).toBeVisible();
+        await expect.soft(homePage.footer.subscriptionHeading).toBeVisible();
+        await homePage.footer.emailInput.fill(validRegistrationData.email!);
+        await homePage.footer.submitButton.click();
+        await expect(homePage.footer.subscibeSuccess).toBeVisible();
     });
 
     test('Test Case 11: Verify Subscription in Cart page', {
@@ -319,7 +318,7 @@ test.describe('Automation Exercise - E2E - Pages', () => {
             type: "userstory",
             description: "https://link.in.jira.net/browse/AE-011",
         }
-    }, async ({homePage, footer, navigationBar}) => {
+    }, async ({homePage}) => {
         /*
         Steps
         1. Launch browser
@@ -332,11 +331,11 @@ test.describe('Automation Exercise - E2E - Pages', () => {
         8. Verify success message 'You have been successfully subscribed!' is visible
         */
         await expect.soft(homePage.automationExcerciseHeading).toBeVisible();
-        await navigationBar.cartButton.click();
-        await expect.soft(footer.subscriptionHeading).toBeVisible();
-        await footer.emailInput.fill(validRegistrationData.email!);
-        await footer.submitButton.click()
-        await expect(footer.subscibeSuccess).toBeVisible();
+        await homePage.navBar.cartButton.click();
+        await expect.soft(homePage.footer.subscriptionHeading).toBeVisible();
+        await homePage.footer.emailInput.fill(validRegistrationData.email!);
+        await homePage.footer.submitButton.click()
+        await expect(homePage.footer.subscibeSuccess).toBeVisible();
     });
 
 });
@@ -353,7 +352,7 @@ test.describe('Automation Exercise - E2E - Product', () => {
             type: "userstory",
             description: "https://link.in.jira.net/browse/AE-008",
         }
-    }, async ({homePage, navigationBar, productsPage}) => {
+    }, async ({homePage, productsPage, productDetailsPage}) => {
         /*
         Steps
         1. Launch browser
@@ -368,19 +367,19 @@ test.describe('Automation Exercise - E2E - Product', () => {
         */
         await test.step('Act', async () => {
             await expect.soft(homePage.automationExcerciseHeading).toBeVisible();
-            await navigationBar.productsButton.click();
+            await homePage.navBar.productsButton.click();
             await expect.soft(productsPage.allProductsHeading).toBeVisible();
         });
         
         await test.step('Assert', async () => {
             const productCard = await productsPage.getProductCardByIndex(0)
-            const productDetails = await productCard.viewProduct()
+            await productCard.viewProduct()
 
-            expect.soft(productDetails.productAvailability).toContainText('In Stock');
-            expect.soft(productDetails.productBrand).toContainText('Polo');
-            expect.soft(productDetails.productCategory).toContainText('Women > Tops');
-            expect.soft(productDetails.productName).toContainText('Blue Top');
-            expect.soft(productDetails.productPrice).toContainText('Rs. 500');
+            expect.soft(productDetailsPage.productAvailability).toContainText('In Stock');
+            expect.soft(productDetailsPage.productBrand).toContainText('Polo');
+            expect.soft(productDetailsPage.productCategory).toContainText('Women > Tops');
+            expect.soft(productDetailsPage.productName).toContainText('Blue Top');
+            expect.soft(productDetailsPage.productPrice).toContainText('Rs. 500');
         });
     });
 
@@ -389,7 +388,7 @@ test.describe('Automation Exercise - E2E - Product', () => {
             type: "userstory",
             description: "https://link.in.jira.net/browse/AE-009",
         }
-    }, async ({homePage, navigationBar, productsPage}) => {
+    }, async ({homePage, productsPage}) => {
         /*
         Steps
         1. Launch browser
@@ -403,7 +402,7 @@ test.describe('Automation Exercise - E2E - Product', () => {
         */
         await test.step('Act', async () => {
             await expect.soft(homePage.automationExcerciseHeading).toBeVisible();
-            await navigationBar.productsButton.click();
+            await homePage.navBar.productsButton.click();
             await expect.soft(productsPage.allProductsHeading).toBeVisible();
             await productsPage.searchProduct('dress')
         });
@@ -423,7 +422,7 @@ test.describe('Automation Exercise - E2E - Product', () => {
             type: "userstory",
             description: "https://link.in.jira.net/browse/AE-012",
         }
-    }, async ({homePage, navigationBar, productsPage, cartPage}) => {
+    }, async ({homePage, productsPage, cartPage}) => {
         /*
         Steps
         1.  Launch browser
@@ -439,14 +438,14 @@ test.describe('Automation Exercise - E2E - Product', () => {
         */
         await test.step('Add products in cart', async () => {
             await expect.soft(homePage.automationExcerciseHeading).toBeVisible();
-            await navigationBar.productsButton.click();
+            await homePage.navBar.productsButton.click();
             await expect.soft(productsPage.allProductsHeading).toBeVisible();
             const card0 = await productsPage.getProductCardByIndex(0);
             await card0.addToCartFromOverlay();
-            await productsPage.continueShoppingFromCartModal();
+            await productsPage.cartModal.continueShoppingButton.click()
             const card1 = await productsPage.getProductCardByIndex(1);
             await card1.addToCartFromOverlay();
-            await productsPage.viewCartFromCartModal();
+            await productsPage.cartModal.viewCartLink.click();
         });
 
         await test.step('Verify cart', async () => {
@@ -463,7 +462,7 @@ test.describe('Automation Exercise - E2E - Product', () => {
             type: "userstory",
             description: "https://link.in.jira.net/browse/AE-012",
         }
-    }, async ({homePage, productsPage, cartPage}) => {
+    }, async ({homePage, productsPage, productDetailsPage, cartPage}) => {
         /*
         Steps
         1. Launch browser
@@ -478,10 +477,9 @@ test.describe('Automation Exercise - E2E - Product', () => {
         */
         await test.step('Add products in cart', async () => {
             await expect.soft(homePage.automationExcerciseHeading).toBeVisible();
-            const card = await productsPage.getProductCardByIndex(0);
-            const productDetails = await card.viewProduct();
-            await productDetails.addToCart('4');
-            await productsPage.viewCartFromCartModal();
+            (await productsPage.getProductCardByIndex(0)).viewProduct()
+            await productDetailsPage.addToCart('4');
+            await productsPage.cartModal.viewCartLink.click();
         });
 
         await test.step('Verify cart', async () => {
@@ -498,7 +496,7 @@ test.describe('Automation Exercise - E2E - Product', () => {
             type: "userstory",
             description: "https://link.in.jira.net/browse/AE-014",
         }
-    }, async ({homePage, productsPage, navigationBar, cartPage, loginPage, signupPage}) => {
+    }, async ({homePage, productsPage, cartPage, loginPage, signupPage}) => {
         /*
         Steps
         1.  Launch browser
@@ -526,11 +524,11 @@ test.describe('Automation Exercise - E2E - Product', () => {
             await expect.soft(homePage.automationExcerciseHeading).toBeVisible();
             const card0 = await productsPage.getProductCardByIndex(0);
             await card0.addToCart();
-            await productsPage.continueShoppingFromCartModal();
+            await productsPage.cartModal.continueShoppingButton.click();
             const card1 = await productsPage.getProductCardByIndex(1);
             await card1.addToCart();
-            await productsPage.continueShoppingFromCartModal();
-            await navigationBar.cartButton.click();
+            await productsPage.cartModal.continueShoppingButton.click();
+            await homePage.navBar.cartButton.click();
             await cartPage.proceedToCheckoutButton.click()
             await cartPage.registerLoginLink.click()
         });
@@ -540,7 +538,7 @@ test.describe('Automation Exercise - E2E - Product', () => {
             await signupPage.createAccount(validRegistrationData);
             await expect.soft(signupPage.accountCreatedHeader).toBeVisible();
             await signupPage.continueButton.click();
-            await expect.soft(navigationBar.page.getByText(`Logged in as ${validRegistrationData.name}`)).toBeVisible();
+            await signupPage.navBar.verifyLoggedInAs(validRegistrationData.name!)
         });
 
         await test.step('Place order', async () => {
@@ -548,7 +546,7 @@ test.describe('Automation Exercise - E2E - Product', () => {
                 .withCardName(validRegistrationData.name!)
                 .build();
 
-            await navigationBar.cartButton.click();
+            await cartPage.navBar.cartButton.click();
             await cartPage.proceedToCheckoutButton.click();
             //await cartPage.verifyBillingAddress(validRegistrationData);
             await cartPage.verifyDeliveryAddress(validRegistrationData);
@@ -559,7 +557,7 @@ test.describe('Automation Exercise - E2E - Product', () => {
         });
 
         await test.step('Delete account', async () => {
-            await navigationBar.deleteAccountButton.click();
+            await signupPage.navBar.deleteAccountButton.click();
             await expect.soft(signupPage.accountDeletedHeader).toBeVisible();
             await signupPage.continueButton.click();
         });
@@ -571,7 +569,7 @@ test.describe('Automation Exercise - E2E - Product', () => {
             type: "userstory",
             description: "https://link.in.jira.net/browse/AE-017",
         }
-    }, async ({homePage, productsPage, navigationBar, cartPage}) => {
+    }, async ({homePage, productsPage, cartPage}) => {
         /*
         Steps
         1. Launch browser
@@ -587,14 +585,14 @@ test.describe('Automation Exercise - E2E - Product', () => {
             await expect.soft(homePage.automationExcerciseHeading).toBeVisible();
             const card0 = await productsPage.getProductCardByIndex(0);
             await card0.addToCart();
-            await productsPage.continueShoppingFromCartModal();
+            await productsPage.cartModal.continueShoppingButton.click();
             const card1 = await productsPage.getProductCardByIndex(1);
             await card1.addToCart();
-            await productsPage.continueShoppingFromCartModal();
+            await productsPage.cartModal.continueShoppingButton.click();
         });
 
         await test.step('Remove particular product from cart', async () => {
-            await navigationBar.cartButton.click();
+            await cartPage.navBar.cartButton.click();
             await cartPage.deleteProductByIndex(1);
         });
 
