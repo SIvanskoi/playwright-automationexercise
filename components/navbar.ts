@@ -1,4 +1,4 @@
-import { Locator, Page, expect } from '@playwright/test';
+import { type Locator, type Page, expect } from '@playwright/test';
 
 
 export class NavigationBar {
@@ -16,7 +16,7 @@ export class NavigationBar {
 
     constructor(readonly page: Page) {
 
-        this.root = this.page.locator('//ul[contains(@class, "navbar-nav")]')
+        this.root = this.page.locator('//ul[contains(@class, "navbar-nav")]');
         
         this.homeButton = this.root.getByRole('link', { name: 'Home' });
         this.productsButton = this.root.getByRole('link', { name: 'Products' });

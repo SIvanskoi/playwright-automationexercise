@@ -1,5 +1,5 @@
 import { APIRequestContext, APIResponse, expect} from '@playwright/test';
-import { RegistrationFormData } from '../utils/fakeuser'
+
 
 export class ApiClient {
 

@@ -749,6 +749,30 @@ test.describe('Automation Exercise - E2E - Product', () => {
     });
 
 
+    test('Test Case 18: View Category Products', {
+        annotation: {
+            type: "userstory",
+            description: "https://link.in.jira.net/browse/AE-018",
+        }
+    }, async ({homePage, productsPage}) => {
+        /*
+        Steps
+        1. Launch browser
+        2. Navigate to url {{base_url}}
+        3. Verify that categories are visible on left side bar
+        4. Click on 'Women' category
+        5. Click on any category link under 'Women' category, for example: Dress
+        6. Verify that category page is displayed and confirm text 'WOMEN - TOPS PRODUCTS'
+        7. On left side bar, click on any sub-category link of 'Men' category
+        8. Verify that user is navigated to that category page
+        */
+        await homePage.leftSideBar.clickCategory(/\bWomen\b/, 'Dress');
+        await productsPage.verifyCategoryHeading('Women - Dress Products');
+        await productsPage.leftSideBar.clickCategory(/\bMen\b/, 'Jeans');
+        await productsPage.verifyCategoryHeading('Men - Tshirts Products');
+    });
+
+
 
 });
 

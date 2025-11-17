@@ -1,4 +1,4 @@
-import { Locator, Page } from '@playwright/test';
+import { type Locator, type Page } from '@playwright/test';
 import { BasePage } from './base.page';
 import { RegistrationFormData } from '../utils/fakeuser'
 
@@ -17,8 +17,6 @@ export class LoginPage extends BasePage {
     readonly signupEmailInput: Locator;
     readonly signupButton: Locator;
     readonly signupExistingCredentials: Locator;
-
-    readonly title: RegExp;
 
     constructor(page: Page) {
         super(page);

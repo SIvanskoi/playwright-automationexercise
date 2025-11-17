@@ -1,4 +1,4 @@
-import { Locator, Page } from '@playwright/test';
+import { type Locator, type Page, expect } from '@playwright/test';
 import { BasePage } from './base.page';
 import { ProductCard } from '../components/productcard';
 
@@ -56,6 +56,10 @@ export class ProductsPage extends BasePage {
         }
         */
         return cards;
+    }
+
+    public async verifyCategoryHeading(categoryHeadingText: string): Promise<void> {
+        expect.soft(this.page.getByRole('heading', { name: categoryHeadingText, exact: true})).toBeVisible();
     }
     
 
