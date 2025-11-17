@@ -2,6 +2,8 @@ import { test, expect } from '../fixtures/fixtures';
 import { RegistrationFormDataBuilder} from '../utils/fakeuser';
 import { PaymentDataBuilder } from '../utils/fakecard';
 import { verifyResponse } from '../api/api.client'
+import apiendpoints from '../utils/apiendpoints';
+import apimessages from '../utils/apimessages'
 import path from 'path';
 import fs from 'fs';
 
@@ -20,7 +22,7 @@ test.describe('Automation Exercise - E2E - Signup / Login', () => {
     
     // Delete existing account after each test
     test.afterEach(async ({ apiClient }) => {
-        await apiClient.deleteAccount(validRegistrationData);        
+        await apiClient.delete(apiendpoints.account.delete, validRegistrationData);        
     });
 
 
@@ -70,7 +72,7 @@ test.describe('Automation Exercise - E2E - Signup / Login', () => {
         });
 
         await test.step('Assert', async () => {
-            const response = await apiClient.getUserDetails(validRegistrationData)
+            const response = await apiClient.get(apiendpoints.account.get, validRegistrationData)
             verifyResponse(response, 404)
         });
     });
@@ -96,8 +98,8 @@ test.describe('Automation Exercise - E2E - Signup / Login', () => {
         10. Verify that 'ACCOUNT DELETED!' is visible
         */
         await test.step('Arrange', async () => {
-            const response = await apiClient.createAccount(validRegistrationData);
-            verifyResponse(response, 201, 'User created!')
+            const response = await apiClient.post(apiendpoints.account.create, validRegistrationData);
+            verifyResponse(response, 201, apimessages.account.created)
         });
 
         await test.step('Act', async () => {
@@ -112,7 +114,7 @@ test.describe('Automation Exercise - E2E - Signup / Login', () => {
         });
 
         await test.step('Assert', async () => {
-            const response = await apiClient.getUserDetails(validRegistrationData)
+            const response = await apiClient.get(apiendpoints.account.get, validRegistrationData)
             verifyResponse(response, 404)
         });
     });
@@ -164,8 +166,8 @@ test.describe('Automation Exercise - E2E - Signup / Login', () => {
         10. Verify that user is navigated to login page
         */
         await test.step('Arrange', async () => {
-            const response = await apiClient.createAccount(validRegistrationData);
-            verifyResponse(response, 201, 'User created!')
+            const response = await apiClient.post(apiendpoints.account.create, validRegistrationData);
+            verifyResponse(response, 201, apimessages.account.created)
         });
 
         await test.step('Act', async () => {
@@ -179,7 +181,7 @@ test.describe('Automation Exercise - E2E - Signup / Login', () => {
         });
 
         await test.step('Assert', async () => {
-            const response = await apiClient.getUserDetails(validRegistrationData)
+            const response = await apiClient.get(apiendpoints.account.get, validRegistrationData)
             verifyResponse(response, 200)
         });
     });
@@ -203,8 +205,8 @@ test.describe('Automation Exercise - E2E - Signup / Login', () => {
         8.  Verify error 'Email Address already exist!' is visible
         */
         await test.step('Arrange', async () => {
-            const response = await apiClient.createAccount(validRegistrationData);
-            verifyResponse(response, 201, 'User created!')
+            const response = await apiClient.post(apiendpoints.account.create, validRegistrationData);
+            verifyResponse(response, 201, apimessages.account.created)
         });
 
         await test.step('Act', async () => {
@@ -344,7 +346,7 @@ test.describe('Automation Exercise - E2E - Product', () => {
 
     // Delete existing account after each test
     test.afterEach(async ({ apiClient }) => {
-        await apiClient.deleteAccount(validRegistrationData);        
+        await apiClient.delete(apiendpoints.account.delete, validRegistrationData);        
     });
 
     test('Test Case 8: Verify All Products and product details page', {
@@ -661,8 +663,8 @@ test.describe('Automation Exercise - E2E - Product', () => {
         17. Verify 'ACCOUNT DELETED!' and click 'Continue' button
         */
         await test.step('Arrange', async () => {
-            const response = await apiClient.createAccount(validRegistrationData);
-            verifyResponse(response, 201, 'User created!')
+            const response = await apiClient.post(apiendpoints.account.create, validRegistrationData);
+            verifyResponse(response, 201, apimessages.account.created)
         });
 
         await test.step('Login', async () => {
