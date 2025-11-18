@@ -1,6 +1,6 @@
 import { Locator, Page } from '@playwright/test';
 
-export class Footer {
+export class FooterBlock {
 
     readonly root: Locator;
 

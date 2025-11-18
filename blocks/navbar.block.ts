@@ -1,7 +1,7 @@
 import { type Locator, type Page, expect } from '@playwright/test';
 
 
-export class NavigationBar {
+export class NavigationBarBlock {
 
     readonly root: Locator;
     readonly homeButton: Locator;

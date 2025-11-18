@@ -1,16 +1,16 @@
 import { type Page, expect } from '@playwright/test';
-import { NavigationBar } from '../components/navbar'
-import { Footer } from '../components/footer';
-import { CartModal } from '../components/cartmodal';
-import { RefineBar } from '../components/refinebar';
+import { NavigationBarBlock } from '../blocks/navbar.block';
+import { FooterBlock } from '../blocks/footer.block';
+import { CartModalBlock } from '../blocks/cartmodal.block';
+import { SideBarBlock } from '../blocks/sidebar.block';
 
 export class BasePage {
 
     readonly page: Page;
-    readonly navBar: NavigationBar;
-    readonly footer: Footer;
-    readonly cartModal: CartModal;
-    readonly leftSideBar: RefineBar; 
+    readonly navBar: NavigationBarBlock;
+    readonly footer: FooterBlock;
+    readonly cartModal: CartModalBlock;
+    readonly leftSideBar: SideBarBlock; 
     url: string;
     title: string | RegExp;
 
@@ -19,10 +19,10 @@ export class BasePage {
         this.url = "";
         this.title = "";
 
-        this.navBar = new NavigationBar(this.page);
-        this.footer = new Footer(this.page);
-        this.cartModal = new CartModal(this.page);
-        this.leftSideBar = new RefineBar(this.page);
+        this.navBar = new NavigationBarBlock(this.page);
+        this.footer = new FooterBlock(this.page);
+        this.cartModal = new CartModalBlock(this.page);
+        this.leftSideBar = new SideBarBlock(this.page);
 
         this.page.on("console", (msg) => console.log("PAGE LOG:", msg.text()));
     }

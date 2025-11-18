@@ -1,6 +1,6 @@
 import { type Locator, type Page, expect } from '@playwright/test';
 import { BasePage } from './base.page';
-import { ProductCard } from '../components/productcard';
+import { ProductCardBlock } from '../blocks/productcard.block';
 
 
 export class ProductsPage extends BasePage {
@@ -23,7 +23,7 @@ export class ProductsPage extends BasePage {
         this.searchProductsHeading = this.page.getByRole('heading', { name: 'Searched Products' })
     }
 
-    public async getProductCardByIndex(index: number): Promise<ProductCard> {
+    public async getProductCardByIndex(index: number): Promise<ProductCardBlock> {
         const cardsCollection = await this.getAllProductCards();
         return cardsCollection[index];
     }
@@ -34,9 +34,9 @@ export class ProductsPage extends BasePage {
         await this.page.waitForURL(`**search=${product}**`);
     }
     
-    public async getAllProductCards(productName?: string | RegExp ): Promise<ProductCard[]> {
+    public async getAllProductCards(productName?: string | RegExp ): Promise<ProductCardBlock[]> {
         const collection = await this.productCard.all();
-        const cards: ProductCard[] = collection.map(locator => new ProductCard(locator));
+        const cards: ProductCardBlock[] = collection.map(locator => new ProductCardBlock(locator));
         /*
         if (productName) {
             

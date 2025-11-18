@@ -1,6 +1,6 @@
 import { type Locator, type Page, } from '@playwright/test';
 
-export class RefineBar {
+export class SideBarBlock {
 
     readonly root: Locator;
     categorySelector = (productCategory : string): string => `//a[@href="#${productCategory}"]`;
