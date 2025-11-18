@@ -83,6 +83,12 @@ export class ProductDetailsPage extends BasePage {
     readonly productCondition: Locator;
     readonly productBrand: Locator;
     readonly quantityInput: Locator;
+    readonly writeReviewLink: Locator;
+    readonly reviewNameInput: Locator;
+    readonly reviewEmailInput: Locator
+    readonly reviewTextInput: Locator;
+    readonly reviewSubmitButton: Locator;
+    readonly reviewSubmitMessage: Locator;
     private productDetail: Record<string, Partial<string>> = {};
 
     constructor(page: Page) {
@@ -96,6 +102,12 @@ export class ProductDetailsPage extends BasePage {
         this.productCondition = this.productInfo.locator('//p[b[text()[normalize-space()="Condition:"]]]');
         this.productBrand = this.productInfo.locator('//p[b[text()[normalize-space()="Brand:"]]]');
         this.quantityInput = this.page.locator('#quantity')
+        this.writeReviewLink = this.page.getByRole('link', { name: 'Write Your Review' });
+        this.reviewNameInput = this.page.getByRole('textbox', { name: 'Your Name' });
+        this.reviewEmailInput = this.page.getByRole('textbox', { name: 'Email Address', exact: true });
+        this.reviewTextInput = this.page.getByRole('textbox', { name: 'Add Review Here!' })
+        this.reviewSubmitButton = this.page.getByRole('button', { name: 'Submit' });
+        this.reviewSubmitMessage = this.page.getByText('Thank you for your review.');
     }
 
     private getDetailValue(detail: string | null): string | null {
@@ -144,5 +156,12 @@ export class ProductDetailsPage extends BasePage {
                 return match[0];
         }
         return null;
+    }
+
+    async submitReview(name: string, email: string, reviewText: string): Promise<void> {
+        await this.reviewNameInput.fill(name);
+        await this.reviewEmailInput.fill(email);
+        await this.reviewTextInput.fill(reviewText);
+        await this.reviewSubmitButton.click();
     }
 }

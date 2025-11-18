@@ -878,6 +878,39 @@ test.describe('Automation Exercise - E2E - Product', () => {
     });
 
 
+    test('Test Case 21: Add review on product', {
+        annotation: {
+            type: "userstory",
+            description: "https://link.in.jira.net/browse/AE-021",
+        }
+    }, async ({homePage, productsPage, productDetailsPage, apiClient}) => {
+        /*
+        Steps
+        1.  Launch browser
+        2.  Navigate to url {{base_url}}
+        3.  Click on 'Products' button
+        4.  Verify user is navigated to ALL PRODUCTS page successfully
+        5.  Click on 'View Product' button
+        6.  Verify 'Write Your Review' is visible
+        7.  Enter name, email and review
+        8.  Click 'Submit' button
+        9.  Verify success message 'Thank you for your review.'
+        10. Verify success message hides
+        */
+        await homePage.navBar.productsButton.click();
+        const cardsCollection = await productsPage.getAllProductCards();
+        await cardsCollection[0].viewProduct();
+        await expect.soft(productDetailsPage.writeReviewLink).toBeVisible();
+        await productDetailsPage.submitReview(
+            validRegistrationData.name!,
+            validRegistrationData.email!,
+            'This is a great product!'
+        );
+        await expect(productDetailsPage.reviewSubmitMessage).toBeVisible();
+        await expect(productDetailsPage.reviewSubmitMessage).not.toBeVisible();
+    });
+
+
 
 });
 

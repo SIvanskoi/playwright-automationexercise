@@ -23,6 +23,8 @@ export class BasePage {
         this.footer = new Footer(this.page);
         this.cartModal = new CartModal(this.page);
         this.leftSideBar = new RefineBar(this.page);
+
+        this.page.on("console", (msg) => console.log("PAGE LOG:", msg.text()));
     }
 
     public async open() {
