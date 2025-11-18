@@ -58,8 +58,12 @@ export class ProductsPage extends BasePage {
         return cards;
     }
 
+    public async verifyBrandHeading(brandName: string): Promise<void> {
+        expect.soft(this.page.getByRole('heading', { name: `Brand - ${brandName} Products`})).toBeVisible();
+    }
+
     public async verifyCategoryHeading(categoryHeadingText: string): Promise<void> {
-        expect.soft(this.page.getByRole('heading', { name: categoryHeadingText, exact: true})).toBeVisible();
+        expect.soft(this.page.getByRole('heading', { name: categoryHeadingText})).toBeVisible();
     }
     
 

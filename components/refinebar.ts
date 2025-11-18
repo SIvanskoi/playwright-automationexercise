@@ -10,13 +10,14 @@ export class RefineBar {
 
     }
 
-    public async clickCategory(productCategory: string | RegExp, productSubcategory?: string | RegExp): Promise<void> {
-        //const categoryProducts: Locator = this.root.locator('//div[contains(@class, "category-products")]');
-        await this.root.getByRole('link', { name: productCategory }).click();
-        if (productSubcategory) await this.root.getByRole('listitem').filter({ hasText: productSubcategory }).click();
+    public async clickCategory(productCategory: string, productSubcategory: string): Promise<void> {
+        await this.root.locator(`//a[@href="#${productCategory}"]`).click();
+        await this.root.locator(`//div[@id="${productCategory}"]//a[contains(text(), "${productSubcategory}")]`).click();
     }
 
-    public async clickBrand(productBrand: string | RegExp): Promise<void> {
-        this.root.getByRole('link', { name: productBrand });
+    public async clickBrand(productBrand: string): Promise<void> {
+        //XPATH this.root.locator(`//div[@class="brands_products"]//a[contains(@href, "${productBrand}")]`).click();
+        await this.root.getByRole('link', { name: productBrand }).click();
+        await this.page.waitForURL(`**/brand_products/${productBrand}`);
     }
 }

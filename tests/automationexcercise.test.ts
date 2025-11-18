@@ -766,10 +766,58 @@ test.describe('Automation Exercise - E2E - Product', () => {
         7. On left side bar, click on any sub-category link of 'Men' category
         8. Verify that user is navigated to that category page
         */
-        await homePage.leftSideBar.clickCategory(/\bWomen\b/, 'Dress');
-        await productsPage.verifyCategoryHeading('Women - Dress Products');
-        await productsPage.leftSideBar.clickCategory(/\bMen\b/, 'Jeans');
-        await productsPage.verifyCategoryHeading('Men - Tshirts Products');
+        const cardsNumber: number = 3;
+        const womenCategory: [string, string, number] = ['Women', 'Dress', cardsNumber];
+        const menCategory: [string, string, number] = ['Men', 'Jeans', cardsNumber];
+
+        await homePage.leftSideBar.clickCategory(womenCategory[0], womenCategory[1]);
+        await productsPage.verifyCategoryHeading(`${womenCategory[0]} - ${womenCategory[1]} Products`);
+        const womenCards = await productsPage.getAllProductCards();
+        expect(womenCards.length).toBe(womenCategory[2]);
+        for (const card of womenCards) {
+            const name = await card.getName();
+            expect.soft(name).toContain(womenCategory[1]);
+        }
+
+        await productsPage.leftSideBar.clickCategory(menCategory[0], menCategory[1]);
+        await productsPage.verifyCategoryHeading(`${menCategory[0]} - ${menCategory[1]} Products`);
+        const menCards = await productsPage.getAllProductCards();
+        expect(menCards.length).toBe(menCategory[2]);
+        for (const card of womenCards) {
+            const name = await card.getName();
+            expect.soft(name).toContain(menCategory[1]);
+        }
+    });
+
+
+    test('Test Case 19: View & Cart Brand Products', {
+        annotation: {
+            type: "userstory",
+            description: "https://link.in.jira.net/browse/AE-019",
+        }
+    }, async ({homePage, productsPage}) => {
+        /*
+        Steps
+        1. Launch browser
+        2. Navigate to url {{base_url}}
+        3. Click on 'Products' button
+        4. Verify that Brands are visible on left side bar
+        5. Click on any brand name
+        6. Verify that user is navigated to brand page and brand products are displayed
+        7. On left side bar, click on any other brand link
+        8. Verify that user is navigated to that brand page and can see products
+        */
+        const firstBrand: [string, number] = ['Madame', 5];
+        const secondBrand: [string, number] = ['Babyhug', 4];
+
+        await homePage.navBar.productsButton.click();
+        await productsPage.leftSideBar.clickBrand(firstBrand[0]);
+        await productsPage.verifyBrandHeading(firstBrand[0]);
+        const poloCards = await productsPage.getAllProductCards();
+        expect(poloCards.length).toBe(firstBrand[1]);
+        await productsPage.leftSideBar.clickBrand(secondBrand[0]);
+        const hmCards = await productsPage.getAllProductCards();
+        expect(hmCards.length).toBe(secondBrand[1]);
     });
 
 
