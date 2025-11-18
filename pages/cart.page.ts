@@ -2,6 +2,7 @@ import { type Locator, type Page, expect } from '@playwright/test';
 import { BasePage } from './base.page';
 import { RegistrationFormData } from '../utils/fakeuser';
 import { PaymentData } from '../utils/fakecard';
+import uimessages from '../utils/uimessages';
 
 export class CartPage extends BasePage {
 
@@ -38,7 +39,7 @@ export class CartPage extends BasePage {
         this.expiryMonthInput = this.page.getByTestId('expiry-month');
         this.expiryYearInput = this.page.getByTestId('expiry-year');
         this.orderConfirmButton = this.page.getByRole('button', { name: 'Pay and Confirm Order' });
-        this.orderSuccessfulText = this.page.getByText('Congratulations! Your order has been confirmed!');
+        this.orderSuccessfulText = this.page.getByText(uimessages.order.success);
     }
 
     /**

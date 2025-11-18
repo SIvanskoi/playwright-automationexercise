@@ -1,6 +1,7 @@
 import { Locator, Page } from '@playwright/test';
 import { BasePage } from './base.page';
 import { RegistrationFormData } from '../utils/fakeuser'
+import uimessages from '../utils/uimessages';
 
 export class ContactUsPage extends BasePage {
 
@@ -25,7 +26,7 @@ export class ContactUsPage extends BasePage {
         this.fileInput = this.page.locator('//input[@type="file"]');
         this.submitButton = this.page.getByTestId('submit-button');
         this.subjectInput = this.page.getByTestId('subject');
-        this.submitStatus = this.page.locator('#contact-page').getByText('Success! Your details have been submitted successfully.');
+        this.submitStatus = this.page.locator('#contact-page').getByText(uimessages.contact.success);
         this.homeButton = this.page.locator('#form-section').getByRole('link', { name: 'Home' });
 
         this.page.on('dialog', dialog => dialog.accept());

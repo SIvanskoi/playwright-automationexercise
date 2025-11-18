@@ -1,6 +1,7 @@
 import { type Locator, type Page } from '@playwright/test';
 import { BasePage } from './base.page';
 import { RegistrationFormData } from '../utils/fakeuser'
+import uimessages from '../utils/uimessages';
 
 export class LoginPage extends BasePage {
 
@@ -28,14 +29,14 @@ export class LoginPage extends BasePage {
         this.loginPasswordInput = this.page.getByTestId('login-password');
         this.loginButton = this.page.getByTestId('login-button');
         this.loginYourAccountHeader = this.page.getByRole('heading', { name: 'Login to your account', exact: true })
-        this.loginIncorrectCredentials = this.page.getByText('Your email or password is incorrect!', { exact: true })
+        this.loginIncorrectCredentials = this.page.getByText(uimessages.login.error.invalid_credentials, { exact: true })
 
         // Signup form locators
         this.signupHeader = this.page.getByRole('heading', { name: 'New User Signup!', exact: true })
         this.signupNameInput = this.page.getByTestId('signup-name');
         this.signupEmailInput = this.page.getByTestId('signup-email');
         this.signupButton = this.page.getByTestId('signup-button');
-        this.signupExistingCredentials = this.page.getByText('Email Address already exist!')
+        this.signupExistingCredentials = this.page.getByText(uimessages.login.error.duplicated_credentials, { exact: true })
 
         this.title = /Signup \/ Login/
         

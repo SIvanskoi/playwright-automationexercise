@@ -1,6 +1,7 @@
 import { type Locator, type Page, expect } from '@playwright/test';
 import { BasePage } from './base.page';
 import { ProductCardBlock } from '../blocks/productcard.block';
+import uimessages from '../utils/uimessages';
 
 
 export class ProductsPage extends BasePage {
@@ -107,7 +108,7 @@ export class ProductDetailsPage extends BasePage {
         this.reviewEmailInput = this.page.getByRole('textbox', { name: 'Email Address', exact: true });
         this.reviewTextInput = this.page.getByRole('textbox', { name: 'Add Review Here!' })
         this.reviewSubmitButton = this.page.getByRole('button', { name: 'Submit' });
-        this.reviewSubmitMessage = this.page.getByText('Thank you for your review.');
+        this.reviewSubmitMessage = this.page.getByText(uimessages.review.success);
     }
 
     private getDetailValue(detail: string | null): string | null {
