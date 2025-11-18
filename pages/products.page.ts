@@ -7,6 +7,7 @@ export class ProductsPage extends BasePage {
 
     readonly allProductsHeading: Locator;
     readonly searchProductInput: Locator;
+    readonly searchProductsHeading: Locator;
     readonly searchButton: Locator;
 
     private productCard: Locator;
@@ -19,6 +20,7 @@ export class ProductsPage extends BasePage {
         this.searchProductInput = this.page.locator('//input[@id="search_product"]')
         this.searchButton = this.page.locator('//button[@id="submit_search"]')
         this.productCard = this.page.locator('//div[@class="product-image-wrapper"]')
+        this.searchProductsHeading = this.page.getByRole('heading', { name: 'Searched Products' })
     }
 
     public async getProductCardByIndex(index: number): Promise<ProductCard> {
@@ -29,6 +31,7 @@ export class ProductsPage extends BasePage {
     public async searchProduct(product: string): Promise<void> {
         await this.searchProductInput.fill(product);
         await this.searchButton.click();
+        await this.page.waitForURL(`**search=${product}**`);
     }
     
     public async getAllProductCards(productName?: string | RegExp ): Promise<ProductCard[]> {

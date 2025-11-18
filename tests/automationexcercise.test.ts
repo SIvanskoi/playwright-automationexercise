@@ -451,7 +451,7 @@ test.describe('Automation Exercise - E2E - Product', () => {
         });
 
         await test.step('Verify cart', async () => {
-            const expectedCart = [
+            const expectedCart: [string, string, string, string][]  = [
                 ['Blue Top', 'Rs. 500', '1', 'Rs. 500'],
                 ['Men Tshirt', 'Rs. 400', '1', 'Rs. 400']
             ];
@@ -485,7 +485,7 @@ test.describe('Automation Exercise - E2E - Product', () => {
         });
 
         await test.step('Verify cart', async () => {
-            const expectedCart = [
+            const expectedCart: [string, string, string, string][] = [
                 ['Blue Top', 'Rs. 500', '4', 'Rs. 2000']
             ];
             await cartPage.verifyCart(expectedCart);
@@ -818,6 +818,63 @@ test.describe('Automation Exercise - E2E - Product', () => {
         await productsPage.leftSideBar.clickBrand(secondBrand[0]);
         const hmCards = await productsPage.getAllProductCards();
         expect(hmCards.length).toBe(secondBrand[1]);
+    });
+
+
+    test('Test Case 20: Search Products and Verify Cart After Login', {
+        annotation: {
+            type: "userstory",
+            description: "https://link.in.jira.net/browse/AE-020",
+        }
+    }, async ({loginPage, homePage, productsPage, cartPage, apiClient}) => {
+        /*
+        Steps
+        1.  Launch browser
+        2.  Navigate to url {{base_url}}
+        3.  Click on 'Products' button
+        4.  Verify user is navigated to ALL PRODUCTS page successfully
+        5.  Enter product name in search input and click search button
+        6.  Verify 'SEARCHED PRODUCTS' is visible
+        7.  Verify all the products related to search are visible
+        8.  Add those products to cart
+        9.  Click 'Cart' button and verify that products are visible in cart
+        10. Click 'Signup / Login' button and login with existing user credentials
+        11. Again, click 'Cart' button
+        12. Verify that products are still visible in cart after login as well
+        */
+        await test.step('Arrange', async () => {
+            const response = await apiClient.post(apiendpoints.account.create, validRegistrationData);
+            verifyResponse(response, 201, apimessages.account.created)
+        });
+
+        const expectedCart: [string, string, string, string][]  = [
+                ['Soft Stretch Jeans', 'Rs. 799', '1', 'Rs. 799'],
+                ['Regular Fit Straight Jeans', 'Rs. 1200', '1', 'Rs. 1200'],
+                ['Grunt Blue Slim Fit Jeans', 'Rs. 1400', '1', 'Rs. 1400'],
+            ];
+
+        await test.step('Search and add products to cart', async () => {
+            await homePage.navBar.productsButton.click();
+            await expect.soft(productsPage.allProductsHeading).toBeVisible();
+            await productsPage.searchProduct('jeans')
+            await expect.soft(productsPage.searchProductsHeading).toBeVisible();
+            const cardCollection = await productsPage.getAllProductCards();
+            expect(cardCollection.length).toBe(expectedCart.length);
+            for (const card of cardCollection) {
+                await card.addToCartButton.click();
+                await productsPage.cartModal.continueShoppingButton.click();
+            }
+            await productsPage.navBar.cartButton.click();
+            await cartPage.verifyCart(expectedCart);
+        });
+
+        await test.step('Login and verify cart', async () => {
+            await cartPage.navBar.signupLoginButton.click();
+            await loginPage.login(validRegistrationData);
+            await cartPage.navBar.cartButton.click();
+            await cartPage.verifyCart(expectedCart);
+        });
+
     });
 
 
