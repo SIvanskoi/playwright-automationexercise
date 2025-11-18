@@ -451,7 +451,7 @@ test.describe('Automation Exercise - E2E - Product', () => {
         });
 
         await test.step('Verify cart', async () => {
-            const expectedCart = [
+            const expectedCart: [string, string, string, string][]  = [
                 ['Blue Top', 'Rs. 500', '1', 'Rs. 500'],
                 ['Men Tshirt', 'Rs. 400', '1', 'Rs. 400']
             ];
@@ -485,7 +485,7 @@ test.describe('Automation Exercise - E2E - Product', () => {
         });
 
         await test.step('Verify cart', async () => {
-            const expectedCart = [
+            const expectedCart: [string, string, string, string][] = [
                 ['Blue Top', 'Rs. 500', '4', 'Rs. 2000']
             ];
             await cartPage.verifyCart(expectedCart);
@@ -746,6 +746,168 @@ test.describe('Automation Exercise - E2E - Product', () => {
             ];
             await cartPage.verifyCart(expectedCart);
         });
+    });
+
+
+    test('Test Case 18: View Category Products', {
+        annotation: {
+            type: "userstory",
+            description: "https://link.in.jira.net/browse/AE-018",
+        }
+    }, async ({homePage, productsPage}) => {
+        /*
+        Steps
+        1. Launch browser
+        2. Navigate to url {{base_url}}
+        3. Verify that categories are visible on left side bar
+        4. Click on 'Women' category
+        5. Click on any category link under 'Women' category, for example: Dress
+        6. Verify that category page is displayed and confirm text 'WOMEN - TOPS PRODUCTS'
+        7. On left side bar, click on any sub-category link of 'Men' category
+        8. Verify that user is navigated to that category page
+        */
+        const cardsNumber: number = 3;
+        const womenCategory: [string, string, number] = ['Women', 'Dress', cardsNumber];
+        const menCategory: [string, string, number] = ['Men', 'Jeans', cardsNumber];
+
+        await homePage.leftSideBar.clickCategory(womenCategory[0], womenCategory[1]);
+        await productsPage.verifyCategoryHeading(`${womenCategory[0]} - ${womenCategory[1]} Products`);
+        const womenCards = await productsPage.getAllProductCards();
+        expect(womenCards.length).toBe(womenCategory[2]);
+        for (const card of womenCards) {
+            const name = await card.getName();
+            expect.soft(name).toContain(womenCategory[1]);
+        }
+
+        await productsPage.leftSideBar.clickCategory(menCategory[0], menCategory[1]);
+        await productsPage.verifyCategoryHeading(`${menCategory[0]} - ${menCategory[1]} Products`);
+        const menCards = await productsPage.getAllProductCards();
+        expect(menCards.length).toBe(menCategory[2]);
+        for (const card of womenCards) {
+            const name = await card.getName();
+            expect.soft(name).toContain(menCategory[1]);
+        }
+    });
+
+
+    test('Test Case 19: View & Cart Brand Products', {
+        annotation: {
+            type: "userstory",
+            description: "https://link.in.jira.net/browse/AE-019",
+        }
+    }, async ({homePage, productsPage}) => {
+        /*
+        Steps
+        1. Launch browser
+        2. Navigate to url {{base_url}}
+        3. Click on 'Products' button
+        4. Verify that Brands are visible on left side bar
+        5. Click on any brand name
+        6. Verify that user is navigated to brand page and brand products are displayed
+        7. On left side bar, click on any other brand link
+        8. Verify that user is navigated to that brand page and can see products
+        */
+        const firstBrand: [string, number] = ['Madame', 5];
+        const secondBrand: [string, number] = ['Babyhug', 4];
+
+        await homePage.navBar.productsButton.click();
+        await productsPage.leftSideBar.clickBrand(firstBrand[0]);
+        await productsPage.verifyBrandHeading(firstBrand[0]);
+        const poloCards = await productsPage.getAllProductCards();
+        expect(poloCards.length).toBe(firstBrand[1]);
+        await productsPage.leftSideBar.clickBrand(secondBrand[0]);
+        const hmCards = await productsPage.getAllProductCards();
+        expect(hmCards.length).toBe(secondBrand[1]);
+    });
+
+
+    test('Test Case 20: Search Products and Verify Cart After Login', {
+        annotation: {
+            type: "userstory",
+            description: "https://link.in.jira.net/browse/AE-020",
+        }
+    }, async ({loginPage, homePage, productsPage, cartPage, apiClient}) => {
+        /*
+        Steps
+        1.  Launch browser
+        2.  Navigate to url {{base_url}}
+        3.  Click on 'Products' button
+        4.  Verify user is navigated to ALL PRODUCTS page successfully
+        5.  Enter product name in search input and click search button
+        6.  Verify 'SEARCHED PRODUCTS' is visible
+        7.  Verify all the products related to search are visible
+        8.  Add those products to cart
+        9.  Click 'Cart' button and verify that products are visible in cart
+        10. Click 'Signup / Login' button and login with existing user credentials
+        11. Again, click 'Cart' button
+        12. Verify that products are still visible in cart after login as well
+        */
+        await test.step('Arrange', async () => {
+            const response = await apiClient.post(apiendpoints.account.create, validRegistrationData);
+            verifyResponse(response, 201, apimessages.account.created)
+        });
+
+        const expectedCart: [string, string, string, string][]  = [
+                ['Soft Stretch Jeans', 'Rs. 799', '1', 'Rs. 799'],
+                ['Regular Fit Straight Jeans', 'Rs. 1200', '1', 'Rs. 1200'],
+                ['Grunt Blue Slim Fit Jeans', 'Rs. 1400', '1', 'Rs. 1400'],
+            ];
+
+        await test.step('Search and add products to cart', async () => {
+            await homePage.navBar.productsButton.click();
+            await expect.soft(productsPage.allProductsHeading).toBeVisible();
+            await productsPage.searchProduct('jeans')
+            await expect.soft(productsPage.searchProductsHeading).toBeVisible();
+            const cardCollection = await productsPage.getAllProductCards();
+            expect(cardCollection.length).toBe(expectedCart.length);
+            for (const card of cardCollection) {
+                await card.addToCartButton.click();
+                await productsPage.cartModal.continueShoppingButton.click();
+            }
+            await productsPage.navBar.cartButton.click();
+            await cartPage.verifyCart(expectedCart);
+        });
+
+        await test.step('Login and verify cart', async () => {
+            await cartPage.navBar.signupLoginButton.click();
+            await loginPage.login(validRegistrationData);
+            await cartPage.navBar.cartButton.click();
+            await cartPage.verifyCart(expectedCart);
+        });
+
+    });
+
+
+    test('Test Case 21: Add review on product', {
+        annotation: {
+            type: "userstory",
+            description: "https://link.in.jira.net/browse/AE-021",
+        }
+    }, async ({homePage, productsPage, productDetailsPage, apiClient}) => {
+        /*
+        Steps
+        1.  Launch browser
+        2.  Navigate to url {{base_url}}
+        3.  Click on 'Products' button
+        4.  Verify user is navigated to ALL PRODUCTS page successfully
+        5.  Click on 'View Product' button
+        6.  Verify 'Write Your Review' is visible
+        7.  Enter name, email and review
+        8.  Click 'Submit' button
+        9.  Verify success message 'Thank you for your review.'
+        10. Verify success message hides
+        */
+        await homePage.navBar.productsButton.click();
+        const cardsCollection = await productsPage.getAllProductCards();
+        await cardsCollection[0].viewProduct();
+        await expect.soft(productDetailsPage.writeReviewLink).toBeVisible();
+        await productDetailsPage.submitReview(
+            validRegistrationData.name!,
+            validRegistrationData.email!,
+            'This is a great product!'
+        );
+        await expect(productDetailsPage.reviewSubmitMessage).toBeVisible();
+        await expect(productDetailsPage.reviewSubmitMessage).not.toBeVisible();
     });
 
 
