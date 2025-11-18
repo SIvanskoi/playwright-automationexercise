@@ -1,6 +1,6 @@
 import { type Locator, type Page } from '@playwright/test';
 
-export class CartModal {
+export class CartModalBlock {
 
     readonly root: Locator;
     readonly continueShoppingButton: Locator;
