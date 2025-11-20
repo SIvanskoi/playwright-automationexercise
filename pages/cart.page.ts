@@ -21,6 +21,7 @@ export class CartPage extends BasePage {
     readonly expiryYearInput: Locator;
     readonly orderConfirmButton: Locator;
     readonly orderSuccessfulText: Locator;
+    readonly downloadInvoiceButton: Locator;
 
     constructor(page: Page) {
         super(page);
@@ -40,6 +41,7 @@ export class CartPage extends BasePage {
         this.expiryYearInput = this.page.getByTestId('expiry-year');
         this.orderConfirmButton = this.page.getByRole('button', { name: 'Pay and Confirm Order' });
         this.orderSuccessfulText = this.page.getByText(uimessages.order.success);
+        this.downloadInvoiceButton = this.page.getByRole('link', { name: 'Download Invoice' })
     }
 
     /**
@@ -48,6 +50,13 @@ export class CartPage extends BasePage {
      */
     public async deleteProductByIndex(index: number): Promise<void> {
         await this.tableRow.nth(index).locator('.cart_quantity_delete').click();
+    }
+
+    public async downloadInvoice(filePath: string): Promise<void> {
+        const downloadPromise = this.page.waitForEvent('download');
+        await this.downloadInvoiceButton.click();
+        const download = await downloadPromise;
+        await download.saveAs(filePath);
     }
 
     public async fillPaymentDataAndConfitmOrder(paymentData: Partial<PaymentData>): Promise<void> {

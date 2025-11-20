@@ -17,11 +17,11 @@ export class ProductsPage extends BasePage {
         super(page);
 
         this.url = '/products'
-        this.allProductsHeading = this.page.getByRole('heading', { name: 'All Products' })
-        this.searchProductInput = this.page.locator('//input[@id="search_product"]')
-        this.searchButton = this.page.locator('//button[@id="submit_search"]')
-        this.productCard = this.page.locator('//div[@class="product-image-wrapper"]')
-        this.searchProductsHeading = this.page.getByRole('heading', { name: 'Searched Products' })
+        this.allProductsHeading = this.page.getByRole('heading', { name: 'All Products' });
+        this.searchProductInput = this.page.locator('//input[@id="search_product"]');
+        this.searchButton = this.page.locator('//button[@id="submit_search"]');
+        this.productCard = this.page.locator('//div[@class="product-image-wrapper"]');
+        this.searchProductsHeading = this.page.getByRole('heading', { name: 'Searched Products' });
     }
 
     public async getProductCardByIndex(index: number): Promise<ProductCardBlock> {

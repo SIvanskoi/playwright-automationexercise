@@ -550,8 +550,6 @@ test.describe('Automation Exercise - E2E - Product', () => {
 
             await cartPage.navBar.cartButton.click();
             await cartPage.proceedToCheckoutButton.click();
-            //await cartPage.verifyBillingAddress(validRegistrationData);
-            await cartPage.verifyDeliveryAddress(validRegistrationData);
             await cartPage.commentInput.fill('new comment');
             await cartPage.placeOrderLink.click();
             await cartPage.fillPaymentDataAndConfitmOrder(paymentData);
@@ -911,6 +909,171 @@ test.describe('Automation Exercise - E2E - Product', () => {
     });
 
 
+    test.fixme('Test Case 22: Add to cart from Recommended items', {
+        annotation: {
+            type: "userstory",
+            description: "https://link.in.jira.net/browse/AE-022",
+        }
+    }, async ({homePage, productsPage, cartPage}) => {
+        // Get rid of direct xpath usage. Add necessary locators in page objects.
+
+        /* 
+        Steps
+        1. Launch browser
+        2. Navigate to url {{base_url}}
+        3. Scroll to bottom of page
+        4. Verify 'RECOMMENDED ITEMS' are visible
+        5. Click on 'Add To Cart' on Recommended product
+        6. Click on 'View Cart' button
+        7. Verify that product is displayed in cart page
+        */
+        await expect.soft(homePage.automationExcerciseHeading).toBeVisible();
+        await homePage.recommendedItemsHeading.scrollIntoViewIfNeeded();
+        await homePage.page.locator('//div[@class="recommended_items"]//div[@class="product-image-wrapper"]').nth(0).getByText('Add to cart').click();
+        await productsPage.cartModal.viewCartLink.click();
+        const expectedCart = [
+            ['Blue Top', 'Rs. 500', '1', 'Rs. 500']
+        ];
+        await cartPage.verifyCart(expectedCart);
+    });
+
+
+    test('Test Case 23: Verify address details in checkout page', {
+        annotation: {
+            type: "userstory",
+            description: "https://link.in.jira.net/browse/AE-023",
+        }
+    }, async ({loginPage, signupPage, homePage, productsPage, cartPage}) => {
+        /*
+        Steps   
+        1.  Launch browser
+        2.  Navigate to url {{base_url}}
+        3.  Verify that home page is visible successfully
+        4.  Click 'Signup / Login' button
+        5.  Fill all details in Signup and create account
+        6.  Verify 'ACCOUNT CREATED!' and click 'Continue' button
+        7.  Verify ' Logged in as username' at top
+        8.  Add products to cart
+        9.  Click 'Cart' button
+        10. Verify that cart page is displayed
+        11. Click Proceed To Checkout
+        12. Verify that the delivery address is same address filled at the time registration of account
+        13. Verify that the billing address is same address filled at the time registration of account
+        14. Click 'Delete Account' button
+        15. Verify 'ACCOUNT DELETED!' and click 'Continue' button
+        */
+        await test.step('Register and login', async () => {
+            await loginPage.open();
+            await loginPage.signup(validRegistrationData);
+            await signupPage.createAccount(validRegistrationData);
+            await expect.soft(signupPage.accountCreatedHeader).toBeVisible();
+            await signupPage.continueButton.click();
+            await signupPage.navBar.verifyLoggedInAs(validRegistrationData.name!)
+        });
+
+        await test.step('Add products in cart', async () => {
+            homePage.navBar.productsButton.click();
+            const card = await productsPage.getProductCardByIndex(0);
+            await card.addToCart();
+            await homePage.navBar.cartButton.click();
+            await cartPage.proceedToCheckoutButton.click()
+        });
+
+        await test.step('Verify delivery address details', async () => {
+            await cartPage.verifyDeliveryAddress(validRegistrationData);
+        });
+
+        await test.step('Verify billing address details', async () => {
+            await cartPage.verifyBillingAddress(validRegistrationData);
+        });
+
+        await test.step('Delete account', async () => {
+            await signupPage.navBar.deleteAccountButton.click();
+            await expect.soft(signupPage.accountDeletedHeader).toBeVisible();
+            await signupPage.continueButton.click();
+        });
+    
+    });
+
+
+    test('Test Case 24: Download Invoice after purchase order', {
+        annotation: {
+            type: "userstory",
+            description: "https://link.in.jira.net/browse/AE-024",
+        }
+    }, async ({loginPage, signupPage, homePage, productsPage, cartPage}) => {
+        /*
+        Steps
+        1. Launch browser
+        2. Navigate to url {{base_url}}
+        3. Verify that home page is visible successfully
+        4. Add products to cart
+        5. Click 'Cart' button
+        6. Verify that cart page is displayed
+        7. Click Proceed To Checkout
+        8. Click 'Register / Login' button
+        9. Fill all details in Signup and create account
+        10. Verify 'ACCOUNT CREATED!' and click 'Continue' button
+        11. Verify 'Logged in as username' at top
+        12. Click 'Cart' button
+        13. Click 'Proceed To Checkout' button
+        14. Verify Address Details and Review Your Order
+        15. Enter description in comment text area and click 'Place Order'
+        16. Enter payment details: Name on Card, Card Number, CVC, Expiration date
+        17. Click 'Pay and Confirm Order' button
+        18. Verify success message 'Your order has been placed successfully!'
+        19. Click 'Download Invoice' button and verify invoice is downloaded successfully.
+        20. Click 'Continue' button
+        21. Click 'Delete Account' button
+        22. Verify 'ACCOUNT DELETED!' and click 'Continue' button
+        */
+       await test.step('Add products in cart', async () => {
+            await expect.soft(homePage.automationExcerciseHeading).toBeVisible();
+            const card0 = await productsPage.getProductCardByIndex(0);
+            await card0.addToCart();
+            await productsPage.cartModal.continueShoppingButton.click();
+            const card1 = await productsPage.getProductCardByIndex(1);
+            await card1.addToCart();
+            await productsPage.cartModal.continueShoppingButton.click();
+            await homePage.navBar.cartButton.click();
+            await cartPage.proceedToCheckoutButton.click()
+            await cartPage.cartModal.registerLoginLink.click()
+        });
+
+        await test.step('Register and login', async () => {
+            await loginPage.signup(validRegistrationData);
+            await signupPage.createAccount(validRegistrationData);
+            await expect.soft(signupPage.accountCreatedHeader).toBeVisible();
+            await signupPage.continueButton.click();
+            await signupPage.navBar.verifyLoggedInAs(validRegistrationData.name!)
+        });
+
+        await test.step('Place order', async () => {
+            const paymentData = new PaymentDataBuilder()
+                .withCardName(validRegistrationData.name!)
+                .build();
+            const filePath  = path.resolve(process.cwd(), 'invoice.txt');
+
+            await cartPage.navBar.cartButton.click();
+            await cartPage.proceedToCheckoutButton.click();
+            await cartPage.commentInput.fill('new comment');
+            await cartPage.placeOrderLink.click();
+            await cartPage.fillPaymentDataAndConfitmOrder(paymentData);
+            await expect.soft(cartPage.orderSuccessfulText).toBeVisible();
+            await cartPage.downloadInvoice(filePath);
+            
+            expect(fs.existsSync(filePath)).toBeTruthy();
+            const fileContent = fs.readFileSync(filePath, 'utf-8');
+            expect(fileContent).toContain(`Hi ${validRegistrationData.name}, Your total purchase amount is 900. Thank you`);
+        });
+
+        await test.step('Delete account', async () => {
+            await signupPage.navBar.deleteAccountButton.click();
+            await expect.soft(signupPage.accountDeletedHeader).toBeVisible();
+            await signupPage.continueButton.click();
+        });
+
+    });
 
 });
 
