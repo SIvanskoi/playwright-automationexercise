@@ -7,10 +7,20 @@ import { ContactUsPage } from '../pages/contactus.page';
 import { TestCasesPage } from '../pages/testcases.page';
 import { ProductsPage, ProductDetailsPage } from '../pages/products.page';
 import { CartPage } from '../pages/cart.page';
+import { ConsoleErrorReader } from '../utils/consoleerrorreader';
 
 
 type API = {
     apiClient: ApiClient;
+};
+
+// Experimental: Fixture-option for logging console errors
+type ConsoleErrorLogger = { 
+    consoleErrorReader: ConsoleErrorReader;
+};
+
+export type ConsoleErrorLoggerOptions = {
+    failTestOnConsoleError: boolean;
 };
 
 
@@ -24,10 +34,11 @@ type Pages = {
     productsPage: ProductsPage;
     productDetailsPage: ProductDetailsPage;
     cartPage: CartPage;
-    consoleErrorReader: void;
 };
 
-export const test = base.extend<Pages & API>({
+export const test = base.extend<Pages & ConsoleErrorLogger & ConsoleErrorLoggerOptions & API>({
+
+    failTestOnConsoleError: [true, { option: true }],
 
     apiClient: async ({ request }, use) => {
         await use(new ApiClient(request));
@@ -65,6 +76,15 @@ export const test = base.extend<Pages & API>({
         await use(new CartPage(page));
     },
 
+    consoleErrorReader: [async ({ page, failTestOnConsoleError }, use, testInfo) => {
+            const reader = new ConsoleErrorReader(page, testInfo);
+            await use(reader);
+            reader.postErrors(failTestOnConsoleError);
+        }, 
+        { scope: 'test', auto: true }
+    ],
+
+    /*
     consoleErrorReader: [
         async ({page}, use, testInfo) => {
             const consoleErrors: string[] = [];
@@ -89,6 +109,7 @@ export const test = base.extend<Pages & API>({
         },
         {scope: "test", auto: true}
     ],
+    */
 
 });
 
