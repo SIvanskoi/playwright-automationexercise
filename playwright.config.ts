@@ -1,4 +1,5 @@
 import { defineConfig, devices } from '@playwright/test';
+import { ConsoleErrorLoggerOptions } from './fixtures/fixtures';
 
 /**
  * Read environment variables from file.
@@ -12,7 +13,7 @@ const isCI = process.env.CI === 'true';
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
-export default defineConfig({
+export default defineConfig<ConsoleErrorLoggerOptions>({
   testDir: './tests',
   /* Run tests in files in parallel */
   fullyParallel: true,
@@ -45,8 +46,11 @@ export default defineConfig({
     headless: isCI,
     //ignoreHTTPSErrors: true,
     video: 'on-first-retry',
+
     screenshot: 'only-on-failure',
     
+    // Fail a test if errors are detected in console (default: true)
+    failTestOnConsoleError: false,
   },
 
   /* Configure projects for major browsers */
@@ -81,6 +85,7 @@ export default defineConfig({
      {
        name: 'Microsoft Edge',
        use: { ...devices['Desktop Edge'], 
+       
        channel: 'msedge',
        viewport: { width: 1920, height: 1080 }, },
      },
