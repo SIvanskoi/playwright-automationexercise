@@ -72,10 +72,10 @@ export const test = base.extend<Pages & API>({
                 if (msg.type() === "error") {
                     const errorText = msg.text();
                     consoleErrors.push(errorText);
-                    console.error(`Caught console error ${errorText}`);
+                    //console.error(`Caught console error ${errorText}`); Logs messages in Attachments ->stderr section. Not needed.
                 }
             });
-            await use();
+            await use(); // Run the test
             // After test
             // Attach errors to the report if any
             if (consoleErrors.length > 0) {
@@ -84,7 +84,7 @@ export const test = base.extend<Pages & API>({
                     contentType: 'text/plain',
                 });
             }
-            testInfo.fail(consoleErrors.length !== 0, `Found errors in console ${consoleErrors.join()}`);
+            testInfo.fail(consoleErrors.length !== 0, 'Found errors in console');
             //expect(consoleErrors.length, `Found errors in console ${consoleErrors.join()}`).toBe(0)
         },
         {scope: "test", auto: true}
