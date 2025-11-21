@@ -1,6 +1,7 @@
 import { type Locator, type Page, expect } from '@playwright/test';
 import { BasePage } from './base.page';
 import { ProductCardBlock } from '../blocks/productcard.block';
+import uimessages from '../utils/uimessages';
 
 
 export class ProductsPage extends BasePage {
@@ -16,11 +17,11 @@ export class ProductsPage extends BasePage {
         super(page);
 
         this.url = '/products'
-        this.allProductsHeading = this.page.getByRole('heading', { name: 'All Products' })
-        this.searchProductInput = this.page.locator('//input[@id="search_product"]')
-        this.searchButton = this.page.locator('//button[@id="submit_search"]')
-        this.productCard = this.page.locator('//div[@class="product-image-wrapper"]')
-        this.searchProductsHeading = this.page.getByRole('heading', { name: 'Searched Products' })
+        this.allProductsHeading = this.page.getByRole('heading', { name: 'All Products' });
+        this.searchProductInput = this.page.locator('//input[@id="search_product"]');
+        this.searchButton = this.page.locator('//button[@id="submit_search"]');
+        this.productCard = this.page.locator('//div[@class="product-image-wrapper"]');
+        this.searchProductsHeading = this.page.getByRole('heading', { name: 'Searched Products' });
     }
 
     public async getProductCardByIndex(index: number): Promise<ProductCardBlock> {
@@ -107,7 +108,7 @@ export class ProductDetailsPage extends BasePage {
         this.reviewEmailInput = this.page.getByRole('textbox', { name: 'Email Address', exact: true });
         this.reviewTextInput = this.page.getByRole('textbox', { name: 'Add Review Here!' })
         this.reviewSubmitButton = this.page.getByRole('button', { name: 'Submit' });
-        this.reviewSubmitMessage = this.page.getByText('Thank you for your review.');
+        this.reviewSubmitMessage = this.page.getByText(uimessages.review.success);
     }
 
     private getDetailValue(detail: string | null): string | null {
