@@ -15,8 +15,8 @@ export class ConsoleErrorReader {
                 const location = message.location();
                 const errorText = `Line: ${location.lineNumber} Text: ${message. text()}`;
                 this.consoleErrors.push(errorText);
-                }
-            });
+            }
+        });
     }
 
     public getErrors(): string[] {
