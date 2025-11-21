@@ -26,7 +26,7 @@ export class BasePage {
         this.leftSideBar = new SideBarBlock(this.page);
         this.scrollUpButton = this.page.locator('//a[@id="scrollUp"]');
 
-        this.page.on("console", (msg) => console.log("PAGE LOG:", msg.text()));
+        //this.page.on("console", (msg) => console.log("PAGE LOG:", msg.text()));
     }
 
     public async open() {
