@@ -1,4 +1,4 @@
-import { type Page, expect } from '@playwright/test';
+import { type Page, type Locator, expect } from '@playwright/test';
 import { NavigationBarBlock } from '../blocks/navbar.block';
 import { FooterBlock } from '../blocks/footer.block';
 import { CartModalBlock } from '../blocks/cartmodal.block';
@@ -11,6 +11,7 @@ export class BasePage {
     readonly footer: FooterBlock;
     readonly cartModal: CartModalBlock;
     readonly leftSideBar: SideBarBlock; 
+    readonly scrollUpButton: Locator;
     url: string;
     title: string | RegExp;
 
@@ -23,6 +24,7 @@ export class BasePage {
         this.footer = new FooterBlock(this.page);
         this.cartModal = new CartModalBlock(this.page);
         this.leftSideBar = new SideBarBlock(this.page);
+        this.scrollUpButton = this.page.locator('//a[@id="scrollUp"]');
 
         this.page.on("console", (msg) => console.log("PAGE LOG:", msg.text()));
     }
@@ -38,5 +40,13 @@ export class BasePage {
     public async verifyTitle(): Promise<void> {
         if (!this.title) throw new Error("Expected page title is empty!");
         await expect.soft(this.page).toHaveTitle(this.title);
+    }
+
+    public async getHeight(): Promise<number> {
+        const pageHeight = await this.page.evaluate(() => {
+        // This will return the height of the entire content, including overflow
+        return document.body.scrollHeight; 
+        });
+        return pageHeight;
     }
 }

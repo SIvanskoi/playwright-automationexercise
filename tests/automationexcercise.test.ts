@@ -340,6 +340,56 @@ test.describe('Automation Exercise - E2E - Pages', () => {
         await expect(homePage.footer.subscibeSuccess).toBeVisible();
     });
 
+
+    test('Test Case 25: Verify Scroll Up using [Arrow] button and Scroll Down functionality', {
+        annotation: {
+            type: "userstory",
+            description: "https://link.in.jira.net/browse/AE-025",
+        }
+    }, async ({homePage}) => {
+        /*
+        Steps
+        1. Launch browser
+        2. Navigate to url 'http://automationexercise.com'
+        3. Verify that home page is visible successfully
+        4. Scroll down page to bottom
+        5. Verify 'SUBSCRIPTION' is visible
+        6. Click on arrow at bottom right side to move upward
+        7. Verify that page is scrolled up and 'Full-Fledged practice website for Automation Engineers' text is visible on screen
+        */
+        await expect(homePage.homepageMarkerHeading).toBeVisible();
+        await expect(homePage.footer.subscriptionHeading).not.toBeInViewport();
+        await homePage.footer.subscriptionHeading.scrollIntoViewIfNeeded();
+        await homePage.scrollUpButton.click();
+        await expect(homePage.homepageMarkerHeading).toBeInViewport();
+    });
+
+
+    test('Test Case 26: Verify Scroll Up without [Arrow] button and Scroll Down functionality', {
+        annotation: {
+            type: "userstory",
+            description: "https://link.in.jira.net/browse/AE-026",
+        }
+    }, async ({homePage}) => {
+        /*
+        Steps
+        1. Launch browser
+        2. Navigate to url 'http://automationexercise.com'
+        3. Verify that home page is visible successfully
+        4. Scroll down page to bottom
+        5. Verify 'SUBSCRIPTION' is visible
+        6. Scroll up page to top
+        7. Verify that page is scrolled up and 'Full-Fledged practice website for Automation Engineers' text is visible on screen
+        */
+        await expect(homePage.homepageMarkerHeading).toBeVisible();
+        const pageHeight = await homePage.getHeight();
+        await expect(homePage.footer.subscriptionHeading).not.toBeInViewport();
+        await homePage.page.mouse.wheel(0, pageHeight);
+        await expect(homePage.footer.subscriptionHeading).toBeInViewport();
+        await homePage.page.mouse.wheel(0, -pageHeight);
+        await expect(homePage.homepageMarkerHeading).toBeInViewport();
+    });
+
 });
 
 test.describe('Automation Exercise - E2E - Product', () => {
