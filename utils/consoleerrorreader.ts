@@ -10,9 +10,10 @@ export class ConsoleErrorReader {
         private testInfo: TestInfo) {
 
         this.consoleErrors = [];
-        this.page.on("console", (consoleMessage) => {
-            if (consoleMessage.type() === "error") {
-                const errorText = consoleMessage.text();
+        this.page.on("console", (message) => {
+            if (message.type() === "error") {
+                const location = message.location();
+                const errorText = `Line: ${location.lineNumber} Text: ${message. text()}`;
                 this.consoleErrors.push(errorText);
                 }
             });

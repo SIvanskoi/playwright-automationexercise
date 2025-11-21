@@ -76,7 +76,7 @@ export const test = base.extend<Pages & ConsoleErrorLogger & ConsoleErrorLoggerO
         await use(new CartPage(page));
     },
 
-    consoleErrorReader: [async ({ page, failTestOnConsoleError }, use, testInfo) => {
+    consoleErrorReader: [async ({ page, failTestOnConsoleError}, use, testInfo) => {
             const reader = new ConsoleErrorReader(page, testInfo);
             await use(reader);
             reader.postErrors(failTestOnConsoleError);
