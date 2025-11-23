@@ -7,7 +7,7 @@ import { ContactUsPage } from '../pages/contactus.page';
 import { TestCasesPage } from '../pages/testcases.page';
 import { ProductsPage, ProductDetailsPage } from '../pages/products.page';
 import { CartPage } from '../pages/cart.page';
-import { ConsoleErrorReader } from '../utils/consoleerrorreader';
+import { ConsoleErrorReader } from '../utils/consolereader';
 
 
 type API = {
@@ -45,7 +45,9 @@ export const test = base.extend<Pages & ConsoleErrorLogger & ConsoleErrorLoggerO
     },
 
     homePage: async ({page}, use) => {
-        await use(new HomePage(page));
+        const homePage = new HomePage(page)
+        await homePage.open();
+        await use(homePage);
     },    
 
     contactUsPage: async ({page}, use) => {

@@ -1,4 +1,5 @@
 import { Locator, Page } from '@playwright/test';
+import { step } from '../utils/step';
 
 
 export class ProductCardBlock {
@@ -22,10 +23,12 @@ export class ProductCardBlock {
         this.productOverlay = this.root.locator('.product-overlay').first()
     }
 
+    @step('Add product to cart from product card')
     public async addToCart(): Promise<void> {
         await this.addToCartButton.click();
     }
 
+    @step('Add product to cart from product overlay')
     public async addToCartFromOverlay(): Promise<void> {
         const box = await this.root.boundingBox();
         const page = this.root.page();
@@ -42,6 +45,7 @@ export class ProductCardBlock {
         return await this.price.textContent();
     }
 
+    @step('View product from product card')
     public async viewProduct(): Promise<void> {
         await this.viewProductLink.click();
     }

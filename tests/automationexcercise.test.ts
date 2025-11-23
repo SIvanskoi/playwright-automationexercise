@@ -13,11 +13,6 @@ const validRegistrationData = new RegistrationFormDataBuilder()
     .withPassword(process.env.AE_PASSWORD!)
     .build()
 
-    
-test.beforeEach(async ({homePage}) => {
-        await homePage.open();
-    });
-
 test.describe('Automation Exercise - E2E - Signup / Login', () => {
     
     // Delete existing account after each test
@@ -53,25 +48,15 @@ test.describe('Automation Exercise - E2E - Signup / Login', () => {
         17. Click 'Delete Account' button
         18. Verify that 'ACCOUNT DELETED!' is visible and click 'Continue' button
         */
-        
-        await test.step('Act', async () => {
-            await expect.soft(homePage.automationExcerciseHeading).toBeVisible();
-            await homePage.navBar.signupLoginButton.click();
-            await expect.soft(loginPage.signupHeader).toBeVisible();
-            await loginPage.signup(validRegistrationData);
-            await expect.soft(signupPage.enterAccountInfoHeader).toBeVisible();
-            await signupPage.newsletterCheckbox.check();
-            await signupPage.offersCheckbox.check();
-            await signupPage.createAccount(validRegistrationData);
-            await expect.soft(signupPage.accountCreatedHeader).toBeVisible();
-            await signupPage.continueButton.click();
-            await signupPage.navBar.verifyLoggedInAs(validRegistrationData.name!)
-            await signupPage.navBar.deleteAccountButton.click();
-            await expect.soft(signupPage.accountDeletedHeader).toBeVisible();
-            await signupPage.continueButton.click();
-        });
+        await expect.soft(homePage.homepageMarkerHeading).toBeVisible();
+        await loginPage.signup(validRegistrationData);
+        await signupPage.createAccount(validRegistrationData, true, true);
+        await expect.soft(signupPage.accountCreatedHeader).toBeVisible();
+        await signupPage.continueButton.click();
+        await signupPage.navBar.verifyLoggedInAs(validRegistrationData.name!)
+        await signupPage.deleteAccount();
 
-        await test.step('Assert', async () => {
+        await test.step('Verify account is deleted', async () => {
             const response = await apiClient.get(apiendpoints.account.get, validRegistrationData)
             verifyResponse(response, 404)
         });
@@ -97,23 +82,17 @@ test.describe('Automation Exercise - E2E - Signup / Login', () => {
         9.  Click 'Delete Account' button
         10. Verify that 'ACCOUNT DELETED!' is visible
         */
-        await test.step('Arrange', async () => {
+        await test.step('Create account using API', async () => {
             const response = await apiClient.post(apiendpoints.account.create, validRegistrationData);
             verifyResponse(response, 201, apimessages.account.created)
         });
 
-        await test.step('Act', async () => {
-            await expect.soft(homePage.automationExcerciseHeading).toBeVisible();
-            await homePage.navBar.signupLoginButton.click();
-            await expect.soft(loginPage.loginYourAccountHeader).toBeVisible();
-            await loginPage.login(validRegistrationData);
-            await signupPage.navBar.verifyLoggedInAs(validRegistrationData.name!)
-            await signupPage.navBar.deleteAccountButton.click();
-            await expect.soft(signupPage.accountDeletedHeader).toBeVisible();
-            await signupPage.continueButton.click();
-        });
+        await expect.soft(homePage.homepageMarkerHeading).toBeVisible();
+        await loginPage.login(validRegistrationData);
+        await signupPage.navBar.verifyLoggedInAs(validRegistrationData.name!)
+        await signupPage.deleteAccount();
 
-        await test.step('Assert', async () => {
+        await test.step('Verify account is deleted', async () => {
             const response = await apiClient.get(apiendpoints.account.get, validRegistrationData)
             verifyResponse(response, 404)
         });
@@ -138,7 +117,7 @@ test.describe('Automation Exercise - E2E - Signup / Login', () => {
         */
         const invalidRegistrationData = new RegistrationFormDataBuilder()
             .build()
-        await expect.soft(homePage.automationExcerciseHeading).toBeVisible();
+        await expect.soft(homePage.homepageMarkerHeading).toBeVisible();
         await homePage.navBar.signupLoginButton.click();
         await expect.soft(loginPage.loginYourAccountHeader).toBeVisible();
         await loginPage.login(invalidRegistrationData);
@@ -165,20 +144,18 @@ test.describe('Automation Exercise - E2E - Signup / Login', () => {
         9.  Click 'Logout' button
         10. Verify that user is navigated to login page
         */
-        await test.step('Arrange', async () => {
+        await test.step('Create account using API', async () => {
             const response = await apiClient.post(apiendpoints.account.create, validRegistrationData);
             verifyResponse(response, 201, apimessages.account.created)
         });
 
-        await test.step('Act', async () => {
-            await expect.soft(homePage.automationExcerciseHeading).toBeVisible();
-            await homePage.navBar.signupLoginButton.click();
-            await expect.soft(loginPage.loginYourAccountHeader).toBeVisible();
-            await loginPage.login(validRegistrationData);
-            await homePage.navBar.verifyLoggedInAs(validRegistrationData.name!)
-            await homePage.navBar.logoutButton.click();
-            await expect.soft(loginPage.loginYourAccountHeader).toBeVisible();
-        });
+        await expect.soft(homePage.homepageMarkerHeading).toBeVisible();
+        await homePage.navBar.signupLoginButton.click();
+        await expect.soft(loginPage.loginYourAccountHeader).toBeVisible();
+        await loginPage.login(validRegistrationData);
+        await homePage.navBar.verifyLoggedInAs(validRegistrationData.name!)
+        await homePage.navBar.logoutButton.click();
+        await expect.soft(loginPage.loginYourAccountHeader).toBeVisible();
 
         await test.step('Assert', async () => {
             const response = await apiClient.get(apiendpoints.account.get, validRegistrationData)
@@ -204,18 +181,15 @@ test.describe('Automation Exercise - E2E - Signup / Login', () => {
         7.  Click 'Signup' button
         8.  Verify error 'Email Address already exist!' is visible
         */
-        await test.step('Arrange', async () => {
+        await test.step('Create account using API', async () => {
             const response = await apiClient.post(apiendpoints.account.create, validRegistrationData);
             verifyResponse(response, 201, apimessages.account.created)
         });
 
-        await test.step('Act', async () => {
-            await expect.soft(homePage.automationExcerciseHeading).toBeVisible();
-            await homePage.navBar.signupLoginButton.click();
-            await expect.soft(loginPage.signupHeader).toBeVisible();
-            await loginPage.signup(validRegistrationData);
-        });
-
+        await expect.soft(homePage.homepageMarkerHeading).toBeVisible();
+        await homePage.navBar.signupLoginButton.click();
+        await loginPage.signup(validRegistrationData);
+        
         await test.step('Assert', async () => {
             await expect(loginPage.signupExistingCredentials).toBeVisible();
         });
@@ -255,17 +229,15 @@ test.describe('Automation Exercise - E2E - Pages', () => {
             fs.writeFileSync(filePath, message, 'utf8');
         });
 
-        await test.step('Act', async () => {
-            await expect.soft(homePage.automationExcerciseHeading).toBeVisible();
-            await homePage.navBar.contactUsButton.click();
-            await expect(contactUsPage.getInTouchHeading).toBeVisible();
-            await contactUsPage.submitContactUsForm(validRegistrationData, message, message, filePath);
-            await expect.soft(contactUsPage.submitStatus).toBeVisible();
-            await contactUsPage.homeButton.click();
-        });
+        await expect.soft(homePage.homepageMarkerHeading).toBeVisible();
+        await homePage.navBar.contactUsButton.click();
+        await expect(contactUsPage.getInTouchHeading).toBeVisible();
+        await contactUsPage.submitContactUsForm(validRegistrationData, message, message, filePath);
+        await expect.soft(contactUsPage.submitStatus).toBeVisible();
+        await contactUsPage.homeButton.click();
 
         await test.step('Assert', async () => {
-            await expect(homePage.automationExcerciseHeading).toBeVisible();
+            await expect(homePage.homepageMarkerHeading).toBeVisible();
         });
 
     });
@@ -285,10 +257,9 @@ test.describe('Automation Exercise - E2E - Pages', () => {
         4. Click on 'Test Cases' button
         5. Verify user is navigated to test cases page successfully
         */
-        await expect.soft(homePage.automationExcerciseHeading).toBeVisible();
+        await expect.soft(homePage.homepageMarkerHeading).toBeVisible();
         await homePage.navBar.testCasesButton.click();
-        const count = await testcasesPage.testcaseHeading.count();
-        expect(count).toBe(26);
+        expect( await testcasesPage.testcaseHeading.count() ).toBe(26);
     });
 
 
@@ -308,7 +279,7 @@ test.describe('Automation Exercise - E2E - Pages', () => {
         6. Enter email address in input and click arrow button
         7. Verify success message 'You have been successfully subscribed!' is visible
         */
-        await expect.soft(homePage.automationExcerciseHeading).toBeVisible();
+        await expect.soft(homePage.homepageMarkerHeading).toBeVisible();
         await expect.soft(homePage.footer.subscriptionHeading).toBeVisible();
         await homePage.footer.emailInput.fill(validRegistrationData.email!);
         await homePage.footer.submitButton.click();
@@ -332,7 +303,7 @@ test.describe('Automation Exercise - E2E - Pages', () => {
         7. Enter email address in input and click arrow button
         8. Verify success message 'You have been successfully subscribed!' is visible
         */
-        await expect.soft(homePage.automationExcerciseHeading).toBeVisible();
+        await expect.soft(homePage.homepageMarkerHeading).toBeVisible();
         await homePage.navBar.cartButton.click();
         await expect.soft(homePage.footer.subscriptionHeading).toBeVisible();
         await homePage.footer.emailInput.fill(validRegistrationData.email!);
@@ -418,21 +389,20 @@ test.describe('Automation Exercise - E2E - Product', () => {
         9. Verify that detail detail is visible: product name, category, price, availability, condition, brand
         */
         await test.step('Act', async () => {
-            await expect.soft(homePage.automationExcerciseHeading).toBeVisible();
+            await expect.soft(homePage.homepageMarkerHeading).toBeVisible();
             await homePage.navBar.productsButton.click();
             await expect.soft(productsPage.allProductsHeading).toBeVisible();
         });
         
-        await test.step('Assert', async () => {
-            const productCard = await productsPage.getProductCardByIndex(0)
-            await productCard.viewProduct()
+        const productCard = await productsPage.getProductCardByIndex(0)
+        await productCard.viewProduct()
 
-            expect.soft(productDetailsPage.productAvailability).toContainText('In Stock');
-            expect.soft(productDetailsPage.productBrand).toContainText('Polo');
-            expect.soft(productDetailsPage.productCategory).toContainText('Women > Tops');
-            expect.soft(productDetailsPage.productName).toContainText('Blue Top');
-            expect.soft(productDetailsPage.productPrice).toContainText('Rs. 500');
-        });
+        expect.soft(productDetailsPage.productAvailability).toContainText('In Stock');
+        expect.soft(productDetailsPage.productBrand).toContainText('Polo');
+        expect.soft(productDetailsPage.productCategory).toContainText('Women > Tops');
+        expect.soft(productDetailsPage.productName).toContainText('Blue Top');
+        expect.soft(productDetailsPage.productPrice).toContainText('Rs. 500');
+        
     });
 
     test('Test Case 9: Search Product', {
@@ -452,13 +422,11 @@ test.describe('Automation Exercise - E2E - Product', () => {
         7. Verify 'SEARCHED PRODUCTS' is visible
         8. Verify all the products related to search are visible
         */
-        await test.step('Act', async () => {
-            await expect.soft(homePage.automationExcerciseHeading).toBeVisible();
-            await homePage.navBar.productsButton.click();
-            await expect.soft(productsPage.allProductsHeading).toBeVisible();
-            await productsPage.searchProduct('dress')
-        });
-
+        await expect.soft(homePage.homepageMarkerHeading).toBeVisible();
+        await homePage.navBar.productsButton.click();
+        await expect.soft(productsPage.allProductsHeading).toBeVisible();
+        await productsPage.searchProduct('dress')
+        
         await test.step('Assert', async () => {
             const cardCollection = await productsPage.getAllProductCards();
             expect.soft(cardCollection.length).toBe(9);
@@ -488,25 +456,21 @@ test.describe('Automation Exercise - E2E - Product', () => {
         9.  Verify both products are added to Cart
         10. Verify their prices, quantity and total price
         */
-        await test.step('Add products in cart', async () => {
-            await expect.soft(homePage.automationExcerciseHeading).toBeVisible();
-            await homePage.navBar.productsButton.click();
-            await expect.soft(productsPage.allProductsHeading).toBeVisible();
-            const card0 = await productsPage.getProductCardByIndex(0);
-            await card0.addToCartFromOverlay();
-            await productsPage.cartModal.continueShoppingButton.click()
-            const card1 = await productsPage.getProductCardByIndex(1);
-            await card1.addToCartFromOverlay();
-            await productsPage.cartModal.viewCartLink.click();
-        });
-
-        await test.step('Verify cart', async () => {
-            const expectedCart: [string, string, string, string][]  = [
-                ['Blue Top', 'Rs. 500', '1', 'Rs. 500'],
-                ['Men Tshirt', 'Rs. 400', '1', 'Rs. 400']
-            ];
-            await cartPage.verifyCart(expectedCart);
-        });
+        await expect.soft(homePage.homepageMarkerHeading).toBeVisible();
+        await homePage.navBar.productsButton.click();
+        await expect.soft(productsPage.allProductsHeading).toBeVisible();
+        const card0 = await productsPage.getProductCardByIndex(0);
+        await card0.addToCartFromOverlay();
+        await productsPage.cartModal.continueShoppingButton.click()
+        const card1 = await productsPage.getProductCardByIndex(1);
+        await card1.addToCartFromOverlay();
+        await productsPage.cartModal.viewCartLink.click();
+        
+        const expectedCart: [string, string, string, string][]  = [
+            ['Blue Top', 'Rs. 500', '1', 'Rs. 500'],
+            ['Men Tshirt', 'Rs. 400', '1', 'Rs. 400']
+        ];
+        await cartPage.verifyCart(expectedCart);
     });
 
     test('Test Case 13: Verify Product quantity in Cart', {
@@ -527,20 +491,15 @@ test.describe('Automation Exercise - E2E - Product', () => {
         8. Click 'View Cart' button
         9. Verify that product is displayed in cart page with exact quantity
         */
-        await test.step('Add products to cart', async () => {
-            await expect.soft(homePage.automationExcerciseHeading).toBeVisible();
-            (await productsPage.getProductCardByIndex(0)).viewProduct()
-            await productDetailsPage.addToCart('4');
-            await productsPage.cartModal.viewCartLink.click();
-        });
-
-        await test.step('Verify cart', async () => {
-            const expectedCart: [string, string, string, string][] = [
-                ['Blue Top', 'Rs. 500', '4', 'Rs. 2000']
-            ];
-            await cartPage.verifyCart(expectedCart);
-        });
-
+        await expect.soft(homePage.homepageMarkerHeading).toBeVisible();
+        (await productsPage.getProductCardByIndex(0)).viewProduct()
+        await productDetailsPage.addToCart(4);
+        await productsPage.cartModal.viewCartLink.click();
+        
+        const expectedCart: [string, string, string, string][] = [
+            ['Blue Top', 'Rs. 500', '4', 'Rs. 2000']
+        ];
+        await cartPage.verifyCart(expectedCart);
     });
 
     test('Test Case 14: Place Order: Register while Checkout', {
@@ -572,27 +531,23 @@ test.describe('Automation Exercise - E2E - Product', () => {
         19. Click 'Delete Account' button
         20. Verify 'ACCOUNT DELETED!' and click 'Continue' button
         */
-        await test.step('Add products in cart', async () => {
-            await expect.soft(homePage.automationExcerciseHeading).toBeVisible();
-            const card0 = await productsPage.getProductCardByIndex(0);
-            await card0.addToCart();
-            await productsPage.cartModal.continueShoppingButton.click();
-            const card1 = await productsPage.getProductCardByIndex(1);
-            await card1.addToCart();
-            await productsPage.cartModal.continueShoppingButton.click();
-            await homePage.navBar.cartButton.click();
-            await cartPage.proceedToCheckoutButton.click()
-            await cartPage.cartModal.registerLoginLink.click()
-        });
-
-        await test.step('Register and login', async () => {
-            await loginPage.signup(validRegistrationData);
-            await signupPage.createAccount(validRegistrationData);
-            await expect.soft(signupPage.accountCreatedHeader).toBeVisible();
-            await signupPage.continueButton.click();
-            await signupPage.navBar.verifyLoggedInAs(validRegistrationData.name!)
-        });
-
+        await expect.soft(homePage.homepageMarkerHeading).toBeVisible();
+        const card0 = await productsPage.getProductCardByIndex(0);
+        await card0.addToCart();
+        await productsPage.cartModal.continueShoppingButton.click();
+        const card1 = await productsPage.getProductCardByIndex(1);
+        await card1.addToCart();
+        await productsPage.cartModal.continueShoppingButton.click();
+        await homePage.navBar.cartButton.click();
+        await cartPage.proceedToCheckoutButton.click()
+        await cartPage.cartModal.registerLoginLink.click()
+        
+        await loginPage.signup(validRegistrationData);
+        await signupPage.createAccount(validRegistrationData);
+        await expect.soft(signupPage.accountCreatedHeader).toBeVisible();
+        await signupPage.continueButton.click();
+        await signupPage.navBar.verifyLoggedInAs(validRegistrationData.name!)
+        
         await test.step('Place order', async () => {
             const paymentData = new PaymentDataBuilder()
                 .withCardName(validRegistrationData.name!)
@@ -606,12 +561,7 @@ test.describe('Automation Exercise - E2E - Product', () => {
             await expect.soft(cartPage.orderSuccessfulText).toBeVisible();
         });
 
-        await test.step('Delete account', async () => {
-            await signupPage.navBar.deleteAccountButton.click();
-            await expect.soft(signupPage.accountDeletedHeader).toBeVisible();
-            await signupPage.continueButton.click();
-        });
-
+        await signupPage.deleteAccount();
     });
 
     test('Test Case 15: Place Order: Register before Checkout', {
@@ -641,25 +591,21 @@ test.describe('Automation Exercise - E2E - Product', () => {
         17. Click 'Delete Account' button
         18. Verify 'ACCOUNT DELETED!' and click 'Continue' button
         */
-        await test.step('Register new user', async () => {
-            await loginPage.navBar.signupLoginButton.click()
-            await loginPage.signup(validRegistrationData);
-            await signupPage.createAccount(validRegistrationData);
-            await signupPage.continueButton.click();
-            await signupPage.navBar.verifyLoggedInAs(validRegistrationData.name!)
-        });
-
-        await test.step('Add products to cart', async () => {
-            const card0 = await productsPage.getProductCardByIndex(0);
-            await card0.addToCart();
-            await productsPage.cartModal.continueShoppingButton.click();
-            const card1 = await productsPage.getProductCardByIndex(1);
-            await card1.addToCart();
-            await productsPage.cartModal.continueShoppingButton.click();
-            await productsPage.navBar.cartButton.click();
-            await cartPage.proceedToCheckoutButton.click()
-        });
-
+        await loginPage.navBar.signupLoginButton.click()
+        await loginPage.signup(validRegistrationData);
+        await signupPage.createAccount(validRegistrationData);
+        await signupPage.continueButton.click();
+        await signupPage.navBar.verifyLoggedInAs(validRegistrationData.name!)
+        
+        const card0 = await productsPage.getProductCardByIndex(0);
+        await card0.addToCart();
+        await productsPage.cartModal.continueShoppingButton.click();
+        const card1 = await productsPage.getProductCardByIndex(1);
+        await card1.addToCart();
+        await productsPage.cartModal.continueShoppingButton.click();
+        await productsPage.navBar.cartButton.click();
+        await cartPage.proceedToCheckoutButton.click()
+        
         await test.step('Place order', async () => {
             const paymentData = new PaymentDataBuilder()
                 .withCardName(validRegistrationData.name!)
@@ -675,12 +621,7 @@ test.describe('Automation Exercise - E2E - Product', () => {
             await expect.soft(cartPage.orderSuccessfulText).toBeVisible();
         });
 
-        await test.step('Delete account', async () => {
-            await signupPage.navBar.deleteAccountButton.click();
-            await expect.soft(signupPage.accountDeletedHeader).toBeVisible();
-            await signupPage.continueButton.click();
-        });
-
+        signupPage.deleteAccount();
     });
 
 
@@ -710,29 +651,25 @@ test.describe('Automation Exercise - E2E - Product', () => {
         16. Click 'Delete Account' button
         17. Verify 'ACCOUNT DELETED!' and click 'Continue' button
         */
-        await test.step('Arrange', async () => {
+        await test.step('Create accout using API', async () => {
             const response = await apiClient.post(apiendpoints.account.create, validRegistrationData);
             verifyResponse(response, 201, apimessages.account.created)
         });
 
-        await test.step('Login', async () => {
-            await expect.soft(homePage.automationExcerciseHeading).toBeVisible();
-            await homePage.navBar.signupLoginButton.click();
-            await loginPage.login(validRegistrationData);
-            await signupPage.navBar.verifyLoggedInAs(validRegistrationData.name!)
-        });
-
-        await test.step('Add products to cart', async () => {
-            const card0 = await productsPage.getProductCardByIndex(0);
-            await card0.addToCart();
-            await productsPage.cartModal.continueShoppingButton.click();
-            const card1 = await productsPage.getProductCardByIndex(1);
-            await card1.addToCart();
-            await productsPage.cartModal.continueShoppingButton.click();
-            await productsPage.navBar.cartButton.click();
-            await cartPage.proceedToCheckoutButton.click()
-        });
-
+        await expect.soft(homePage.homepageMarkerHeading).toBeVisible();
+        await homePage.navBar.signupLoginButton.click();
+        await loginPage.login(validRegistrationData);
+        await signupPage.navBar.verifyLoggedInAs(validRegistrationData.name!)
+        
+        const card0 = await productsPage.getProductCardByIndex(0);
+        await card0.addToCart();
+        await productsPage.cartModal.continueShoppingButton.click();
+        const card1 = await productsPage.getProductCardByIndex(1);
+        await card1.addToCart();
+        await productsPage.cartModal.continueShoppingButton.click();
+        await productsPage.navBar.cartButton.click();
+        await cartPage.proceedToCheckoutButton.click()
+        
         await test.step('Place order', async () => {
             const paymentData = new PaymentDataBuilder()
                 .withCardName(validRegistrationData.name!)
@@ -748,12 +685,7 @@ test.describe('Automation Exercise - E2E - Product', () => {
             await expect.soft(cartPage.orderSuccessfulText).toBeVisible();
         });
 
-        await test.step('Delete account', async () => {
-            await signupPage.navBar.deleteAccountButton.click();
-            await expect.soft(signupPage.accountDeletedHeader).toBeVisible();
-            await signupPage.continueButton.click();
-        });
-
+        signupPage.deleteAccount();
     });
 
     test('Test Case 17: Remove Products From Cart', {
@@ -773,27 +705,21 @@ test.describe('Automation Exercise - E2E - Product', () => {
         7. Click 'X' button corresponding to particular product
         8. Verify that product is removed from the cart
         */
-        await test.step('Add products in cart', async () => {
-            await expect.soft(homePage.automationExcerciseHeading).toBeVisible();
-            const card0 = await productsPage.getProductCardByIndex(0);
-            await card0.addToCart();
-            await productsPage.cartModal.continueShoppingButton.click();
-            const card1 = await productsPage.getProductCardByIndex(1);
-            await card1.addToCart();
-            await productsPage.cartModal.continueShoppingButton.click();
-        });
-
-        await test.step('Remove particular product from cart', async () => {
-            await cartPage.navBar.cartButton.click();
-            await cartPage.deleteProductByIndex(1);
-        });
-
-        await test.step('Verify cart', async () => {
-            const expectedCart = [
-                ['Blue Top', 'Rs. 500', '1', 'Rs. 500']
-            ];
-            await cartPage.verifyCart(expectedCart);
-        });
+        await expect.soft(homePage.homepageMarkerHeading).toBeVisible();
+        const card0 = await productsPage.getProductCardByIndex(0);
+        await card0.addToCart();
+        await productsPage.cartModal.continueShoppingButton.click();
+        const card1 = await productsPage.getProductCardByIndex(1);
+        await card1.addToCart();
+        await productsPage.cartModal.continueShoppingButton.click();
+        
+        await cartPage.navBar.cartButton.click();
+        await cartPage.deleteProductByIndex(1);
+        
+        const expectedCart = [
+            ['Blue Top', 'Rs. 500', '1', 'Rs. 500']
+        ];
+        await cartPage.verifyCart(expectedCart);
     });
 
 
@@ -890,7 +816,7 @@ test.describe('Automation Exercise - E2E - Product', () => {
         11. Again, click 'Cart' button
         12. Verify that products are still visible in cart after login as well
         */
-        await test.step('Arrange', async () => {
+        await test.step('Create user using API', async () => {
             const response = await apiClient.post(apiendpoints.account.create, validRegistrationData);
             verifyResponse(response, 201, apimessages.account.created)
         });
@@ -901,28 +827,23 @@ test.describe('Automation Exercise - E2E - Product', () => {
                 ['Grunt Blue Slim Fit Jeans', 'Rs. 1400', '1', 'Rs. 1400'],
             ];
 
-        await test.step('Search and add products to cart', async () => {
-            await homePage.navBar.productsButton.click();
-            await expect.soft(productsPage.allProductsHeading).toBeVisible();
-            await productsPage.searchProduct('jeans')
-            await expect.soft(productsPage.searchProductsHeading).toBeVisible();
-            const cardCollection = await productsPage.getAllProductCards();
-            expect(cardCollection.length).toBe(expectedCart.length);
-            for (const card of cardCollection) {
-                await card.addToCartButton.click();
-                await productsPage.cartModal.continueShoppingButton.click();
-            }
-            await productsPage.navBar.cartButton.click();
-            await cartPage.verifyCart(expectedCart);
-        });
-
-        await test.step('Login and verify cart', async () => {
-            await cartPage.navBar.signupLoginButton.click();
-            await loginPage.login(validRegistrationData);
-            await cartPage.navBar.cartButton.click();
-            await cartPage.verifyCart(expectedCart);
-        });
-
+        await homePage.navBar.productsButton.click();
+        await expect.soft(productsPage.allProductsHeading).toBeVisible();
+        await productsPage.searchProduct('jeans')
+        await expect.soft(productsPage.searchProductsHeading).toBeVisible();
+        const cardCollection = await productsPage.getAllProductCards();
+        expect(cardCollection.length).toBe(expectedCart.length);
+        for (const card of cardCollection) {
+            await card.addToCartButton.click();
+            await productsPage.cartModal.continueShoppingButton.click();
+        }
+        await productsPage.navBar.cartButton.click();
+        await cartPage.verifyCart(expectedCart);
+        
+        await cartPage.navBar.signupLoginButton.click();
+        await loginPage.login(validRegistrationData);
+        await cartPage.navBar.cartButton.click();
+        await cartPage.verifyCart(expectedCart);
     });
 
 
@@ -977,7 +898,7 @@ test.describe('Automation Exercise - E2E - Product', () => {
         6. Click on 'View Cart' button
         7. Verify that product is displayed in cart page
         */
-        await expect.soft(homePage.automationExcerciseHeading).toBeVisible();
+        await expect.soft(homePage.homepageMarkerHeading).toBeVisible();
         await homePage.recommendedItemsHeading.scrollIntoViewIfNeeded();
         await homePage.page.locator('//div[@class="recommended_items"]//div[@class="product-image-wrapper"]').nth(0).getByText('Add to cart').click();
         await productsPage.cartModal.viewCartLink.click();
@@ -1012,37 +933,24 @@ test.describe('Automation Exercise - E2E - Product', () => {
         14. Click 'Delete Account' button
         15. Verify 'ACCOUNT DELETED!' and click 'Continue' button
         */
-        await test.step('Register and login', async () => {
-            await loginPage.open();
-            await loginPage.signup(validRegistrationData);
-            await signupPage.createAccount(validRegistrationData);
-            await expect.soft(signupPage.accountCreatedHeader).toBeVisible();
-            await signupPage.continueButton.click();
-            await signupPage.navBar.verifyLoggedInAs(validRegistrationData.name!)
-        });
-
-        await test.step('Add products in cart', async () => {
-            homePage.navBar.productsButton.click();
-            const card = await productsPage.getProductCardByIndex(0);
-            await card.addToCart();
-            await homePage.navBar.cartButton.click();
-            await cartPage.proceedToCheckoutButton.click()
-        });
-
-        await test.step('Verify delivery address details', async () => {
-            await cartPage.verifyDeliveryAddress(validRegistrationData);
-        });
-
-        await test.step('Verify billing address details', async () => {
-            await cartPage.verifyBillingAddress(validRegistrationData);
-        });
-
-        await test.step('Delete account', async () => {
-            await signupPage.navBar.deleteAccountButton.click();
-            await expect.soft(signupPage.accountDeletedHeader).toBeVisible();
-            await signupPage.continueButton.click();
-        });
-    
+        await loginPage.open();
+        await loginPage.signup(validRegistrationData);
+        await signupPage.createAccount(validRegistrationData);
+        await expect.soft(signupPage.accountCreatedHeader).toBeVisible();
+        await signupPage.continueButton.click();
+        await signupPage.navBar.verifyLoggedInAs(validRegistrationData.name!)
+        
+        homePage.navBar.productsButton.click();
+        const card = await productsPage.getProductCardByIndex(0);
+        await card.addToCart();
+        await homePage.navBar.cartButton.click();
+        await cartPage.proceedToCheckoutButton.click()
+        
+        await cartPage.verifyDeliveryAddress(validRegistrationData);
+        
+        await cartPage.verifyBillingAddress(validRegistrationData);
+        
+        signupPage.deleteAccount();
     });
 
 
@@ -1077,51 +985,41 @@ test.describe('Automation Exercise - E2E - Product', () => {
         21. Click 'Delete Account' button
         22. Verify 'ACCOUNT DELETED!' and click 'Continue' button
         */
-       await test.step('Add products in cart', async () => {
-            await expect.soft(homePage.automationExcerciseHeading).toBeVisible();
-            const card0 = await productsPage.getProductCardByIndex(0);
-            await card0.addToCart();
-            await productsPage.cartModal.continueShoppingButton.click();
-            const card1 = await productsPage.getProductCardByIndex(1);
-            await card1.addToCart();
-            await productsPage.cartModal.continueShoppingButton.click();
-            await homePage.navBar.cartButton.click();
-            await cartPage.proceedToCheckoutButton.click()
-            await cartPage.cartModal.registerLoginLink.click()
-        });
+        await expect.soft(homePage.homepageMarkerHeading).toBeVisible();
+        const card0 = await productsPage.getProductCardByIndex(0);
+        await card0.addToCart();
+        await productsPage.cartModal.continueShoppingButton.click();
+        const card1 = await productsPage.getProductCardByIndex(1);
+        await card1.addToCart();
+        await productsPage.cartModal.continueShoppingButton.click();
+        await homePage.navBar.cartButton.click();
+        await cartPage.proceedToCheckoutButton.click()
+        await cartPage.cartModal.registerLoginLink.click()
+        
+        await loginPage.signup(validRegistrationData);
+        await signupPage.createAccount(validRegistrationData);
+        await expect.soft(signupPage.accountCreatedHeader).toBeVisible();
+        await signupPage.continueButton.click();
+        await signupPage.navBar.verifyLoggedInAs(validRegistrationData.name!)
+        
+        const paymentData = new PaymentDataBuilder()
+            .withCardName(validRegistrationData.name!)
+            .build();
+        const filePath  = path.resolve(process.cwd(), 'invoice.txt');
 
-        await test.step('Register and login', async () => {
-            await loginPage.signup(validRegistrationData);
-            await signupPage.createAccount(validRegistrationData);
-            await expect.soft(signupPage.accountCreatedHeader).toBeVisible();
-            await signupPage.continueButton.click();
-            await signupPage.navBar.verifyLoggedInAs(validRegistrationData.name!)
-        });
-
-        await test.step('Place order', async () => {
-            const paymentData = new PaymentDataBuilder()
-                .withCardName(validRegistrationData.name!)
-                .build();
-            const filePath  = path.resolve(process.cwd(), 'invoice.txt');
-
-            await cartPage.navBar.cartButton.click();
-            await cartPage.proceedToCheckoutButton.click();
-            await cartPage.commentInput.fill('new comment');
-            await cartPage.placeOrderLink.click();
-            await cartPage.fillPaymentDataAndConfitmOrder(paymentData);
-            await expect.soft(cartPage.orderSuccessfulText).toBeVisible();
-            await cartPage.downloadInvoice(filePath);
+        await cartPage.navBar.cartButton.click();
+        await cartPage.proceedToCheckoutButton.click();
+        await cartPage.commentInput.fill('new comment');
+        await cartPage.placeOrderLink.click();
+        await cartPage.fillPaymentDataAndConfitmOrder(paymentData);
+        await expect.soft(cartPage.orderSuccessfulText).toBeVisible();
+        await cartPage.downloadInvoice(filePath);
             
-            expect(fs.existsSync(filePath)).toBeTruthy();
-            const fileContent = fs.readFileSync(filePath, 'utf-8');
-            expect(fileContent).toContain(`Hi ${validRegistrationData.name}, Your total purchase amount is 900. Thank you`);
-        });
+        expect(fs.existsSync(filePath)).toBeTruthy();
+        const fileContent = fs.readFileSync(filePath, 'utf-8');
+        expect(fileContent).toContain(`Hi ${validRegistrationData.name}, Your total purchase amount is 900. Thank you`);
 
-        await test.step('Delete account', async () => {
-            await signupPage.navBar.deleteAccountButton.click();
-            await expect.soft(signupPage.accountDeletedHeader).toBeVisible();
-            await signupPage.continueButton.click();
-        });
+        signupPage.deleteAccount();
 
     });
 

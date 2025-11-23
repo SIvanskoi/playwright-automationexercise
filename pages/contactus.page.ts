@@ -2,6 +2,7 @@ import { Locator, Page } from '@playwright/test';
 import { BasePage } from './base.page';
 import { RegistrationFormData } from '../utils/fakeuser'
 import uimessages from '../utils/uimessages';
+import { step } from '../utils/step';
 
 export class ContactUsPage extends BasePage {
 
@@ -32,7 +33,8 @@ export class ContactUsPage extends BasePage {
         this.page.on('dialog', dialog => dialog.accept());
     }
 
-    async submitContactUsForm(formData: Partial<RegistrationFormData>, subject: string, message: string, filePath: string): Promise<void> {
+    @step('Submit contact us form')
+    public async submitContactUsForm(formData: Partial<RegistrationFormData>, subject: string, message: string, filePath: string): Promise<void> {
         await this.nameInput.fill(formData.name!);
         await this.emailInput.fill(formData.email!);
         await this.subjectInput.fill(subject);

@@ -1,6 +1,7 @@
-import { Locator, Page } from '@playwright/test';
+import { Locator, Page, expect } from '@playwright/test';
 import { BasePage } from './base.page';
 import { RegistrationFormData } from '../utils/fakeuser'
+import { step } from '../utils/step';
 
 export class SignupPage extends BasePage {
 
@@ -60,7 +61,9 @@ export class SignupPage extends BasePage {
         this.accountCreatedHeader = this.page.getByText('Account Created!');
     }
 
-    public async createAccount(formData: Partial<RegistrationFormData>): Promise<void> {
+    @step('Create Account')
+    public async createAccount(formData: Partial<RegistrationFormData>, subscribeOffers: boolean = false, subscribeNews: boolean = false): Promise<void>  {
+        await expect.soft(this.enterAccountInfoHeader).toBeVisible();
         if (formData.name) {
             await this.nameInput.fill(formData.name);
         }
@@ -103,7 +106,20 @@ export class SignupPage extends BasePage {
         if (formData.mobile_number) {
             await this.mobileNumberInput.fill(formData.mobile_number)
         }
+        if (subscribeNews) {
+            await this.newsletterCheckbox.check();
+        }
+        if (subscribeOffers) {
+            await this.offersCheckbox.check();
+        }
         await this.createAccountButton.click();
+    }
+
+    @step('Delete Account')
+    public async deleteAccount(): Promise<void> {
+        await this.navBar.deleteAccountButton.click();
+        await expect.soft(this.accountDeletedHeader).toBeVisible();
+        await this.continueButton.click();
     }
 
 }

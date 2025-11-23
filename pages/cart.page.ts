@@ -3,6 +3,7 @@ import { BasePage } from './base.page';
 import { RegistrationFormData } from '../utils/fakeuser';
 import { PaymentData } from '../utils/fakecard';
 import uimessages from '../utils/uimessages';
+import { step } from '../utils/step';
 
 export class CartPage extends BasePage {
 
@@ -46,12 +47,18 @@ export class CartPage extends BasePage {
 
     /**
      * Deletes a product in cart table.
-     * @param index Index of a row where the product is located. 
+     * @param index Index of a row where the product is located 
      */
-    public async deleteProductByIndex(index: number): Promise<void> {
-        await this.tableRow.nth(index).locator('.cart_quantity_delete').click();
+    @step('Delete product from cart by row index')
+    public async deleteProductByIndex(rowIndex: number): Promise<void> {
+        await this.tableRow.nth(rowIndex).locator('.cart_quantity_delete').click();
     }
 
+    /**
+     * 
+     * @param filePath Invoice file download path
+     */
+    @step('Download invoice')
     public async downloadInvoice(filePath: string): Promise<void> {
         const downloadPromise = this.page.waitForEvent('download');
         await this.downloadInvoiceButton.click();
@@ -59,6 +66,7 @@ export class CartPage extends BasePage {
         await download.saveAs(filePath);
     }
 
+    @step('Fill payment data and confirm order')
     public async fillPaymentDataAndConfitmOrder(paymentData: Partial<PaymentData>): Promise<void> {
         if (paymentData.cardname) await this.cardNameInput.fill(paymentData.cardname);
         if (paymentData.cardnumber) await this.cardNumberInput.fill(paymentData.cardnumber);
@@ -79,10 +87,12 @@ export class CartPage extends BasePage {
         await expect.soft(listLocator.locator('//li[@class="address_phone"]')).toHaveText(`${registrationFormData.mobile_number}`);
     }
 
+    @step('Verify delivery address')
     public async verifyDeliveryAddress(registrationFormData: Partial<RegistrationFormData>): Promise<void> {
         await this.verifyList(this.deliveryAddressList, registrationFormData);
     }
 
+    @step('Verify billing address')
     public async verifyBillingAddress(registrationFormData: Partial<RegistrationFormData>): Promise<void> {
         await this.verifyList(this.invoiceAddressList, registrationFormData);
     }
@@ -105,6 +115,7 @@ export class CartPage extends BasePage {
      *           ['Red Dress', 'Rs. 800', '1', 'Rs. 800']
      *       ];
      */
+    @step('Verify cart contents')
     public async verifyCart(cartTable: string[][]): Promise<void> {
         
         await expect(this.tableRow).toHaveCount(cartTable.length);

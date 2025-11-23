@@ -2,6 +2,7 @@ import { type Locator, type Page, expect } from '@playwright/test';
 import { BasePage } from './base.page';
 import { ProductCardBlock } from '../blocks/productcard.block';
 import uimessages from '../utils/uimessages';
+import { step } from '../utils/step';
 
 
 export class ProductsPage extends BasePage {
@@ -29,6 +30,7 @@ export class ProductsPage extends BasePage {
         return cardsCollection[index];
     }
 
+    @step('Search product')
     public async searchProduct(product: string): Promise<void> {
         await this.searchProductInput.fill(product);
         await this.searchButton.click();
@@ -118,38 +120,43 @@ export class ProductDetailsPage extends BasePage {
         return null;
     }
 
-    async addToCart(quantity?: string): Promise<void> {
+    /**
+     * 
+     * @param quantity Adds specified quantity of the current product to cart
+     */
+    @step('Add product to cart')
+    public async addToCart(quantity?: number): Promise<void> {
         if (quantity) {
-            await this.quantityInput.fill(quantity)
+            await this.quantityInput.fill(quantity.toString())
         }
         await this.addToCartButton.click()
     }
 
-    async getAvailability(): Promise<string | null> {
+    public async getAvailability(): Promise<string | null> {
         const availability = await this.productAvailability.textContent();
         return this.getDetailValue(availability);
     }
 
-    async getBrand(): Promise<string | null> {
+    public async getBrand(): Promise<string | null> {
         const brand = await this.productBrand.textContent();
         return this.getDetailValue(brand);
     }
 
-    async getCategory(): Promise<string | null> {
+    public async getCategory(): Promise<string | null> {
         const category = await this.productCategory.textContent();
         return this.getDetailValue(category);
     }
 
-    async getCondition(): Promise<string | null> {
+    public async getCondition(): Promise<string | null> {
         const condition = await this.productCondition.textContent();
         return this.getDetailValue(condition);
     }
 
-    async getName(): Promise<string | null> {
+    public async getName(): Promise<string | null> {
         return await this.productName.textContent();
     }
 
-    async getPrice(): Promise<string | null> {
+    public async getPrice(): Promise<string | null> {
         const price = await this.productPrice.textContent();
         if (price) {
             const match = price.match(/\d+(\.\d+)?/);
@@ -159,7 +166,8 @@ export class ProductDetailsPage extends BasePage {
         return null;
     }
 
-    async submitReview(name: string, email: string, reviewText: string): Promise<void> {
+    @step('Submit product review')
+    public async submitReview(name: string, email: string, reviewText: string): Promise<void> {
         await this.reviewNameInput.fill(name);
         await this.reviewEmailInput.fill(email);
         await this.reviewTextInput.fill(reviewText);
