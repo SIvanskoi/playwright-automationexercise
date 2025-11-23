@@ -1,7 +1,9 @@
-import { type Locator, type Page } from '@playwright/test';
+import { type Locator, type Page, expect } from '@playwright/test';
 import { BasePage } from './base.page';
 import { RegistrationFormData } from '../utils/fakeuser'
+import { step } from '../utils/step';
 import uimessages from '../utils/uimessages';
+
 
 export class LoginPage extends BasePage {
 
@@ -42,7 +44,10 @@ export class LoginPage extends BasePage {
         
     }
 
+    @step('Login')
     public async login(formData: Partial<RegistrationFormData>): Promise<void> {
+        await this.navBar.signupLoginButton.click();
+        await expect.soft(this.loginYourAccountHeader).toBeVisible();
         if (formData.email) {
             await this.loginEmailInput.fill(formData.email);
         }
@@ -52,7 +57,10 @@ export class LoginPage extends BasePage {
         await this.loginButton.click();
     }
 
+    @step('Signup')
     public async signup(formData: Partial<RegistrationFormData>): Promise<void> {
+        await this.navBar.signupLoginButton.click();
+        await expect.soft(this.signupHeader).toBeVisible();
         if (formData.name) {
             await this.signupNameInput.fill(formData.name);
         }
