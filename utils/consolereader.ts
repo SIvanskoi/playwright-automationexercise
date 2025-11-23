@@ -6,14 +6,15 @@ export class ConsoleErrorReader {
     private consoleErrors: string[];
 
     constructor(
-        private page: Page,
-        private testInfo: TestInfo) {
+        private readonly page: Page,
+        private readonly testInfo: TestInfo,
+        private readonly failTestOnConsoleError: boolean) {
 
         this.consoleErrors = [];
         this.page.on("console", (message) => {
             if (message.type() === "error") {
                 const location = message.location();
-                const errorText = `Line: ${location.lineNumber} Text: ${message. text()}`;
+                const errorText = `URL ${location.url}\n Line: ${location.lineNumber} Text: ${message. text()}`;
                 this.consoleErrors.push(errorText);
             }
         });
@@ -31,7 +32,7 @@ export class ConsoleErrorReader {
         return this.consoleErrors.length;
     }
 
-    public async postErrors(failTestOnErrors: boolean): Promise<void> {
+    public async postErrors(): Promise<void> {
         if (this.consoleErrors.length > 0) {
             await this.testInfo.attach('Console Errors', 
             {
@@ -39,7 +40,7 @@ export class ConsoleErrorReader {
                 contentType: 'text/plain',
             });
         }
-        if (failTestOnErrors) {
+        if (this.failTestOnConsoleError) {
             expect(this.consoleErrors.length, `Found ${this.consoleErrors.length} errors in console`).toEqual(0);
         }
     }
