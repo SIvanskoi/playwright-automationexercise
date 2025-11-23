@@ -79,9 +79,9 @@ export const test = base.extend<Pages & ConsoleErrorLogger & ConsoleErrorLoggerO
     },
 
     consoleErrorReader: [async ({ page, failTestOnConsoleError}, use, testInfo) => {
-            const reader = new ConsoleErrorReader(page, testInfo);
+            const reader = new ConsoleErrorReader(page, testInfo, failTestOnConsoleError);
             await use(reader);
-            reader.postErrors(failTestOnConsoleError);
+            reader.postErrors();
         }, 
         { scope: 'test', auto: true }
     ],

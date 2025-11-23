@@ -9,7 +9,6 @@ import dotenv from 'dotenv';
 import path from 'path';
 dotenv.config({ path: path.resolve(__dirname, '.env') });
 
-const isCI = process.env.CI === 'true';
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
