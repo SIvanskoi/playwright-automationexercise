@@ -591,7 +591,7 @@ test.describe('Automation Exercise - E2E - Product', () => {
         17. Click 'Delete Account' button
         18. Verify 'ACCOUNT DELETED!' and click 'Continue' button
         */
-        await loginPage.navBar.signupLoginButton.click()
+        await loginPage.open();
         await loginPage.signup(validRegistrationData);
         await signupPage.createAccount(validRegistrationData);
         await signupPage.continueButton.click();
