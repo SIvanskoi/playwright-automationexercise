@@ -26,7 +26,7 @@ test.describe('Automation Exercise - E2E - Signup / Login', () => {
             type: "userstory",
             description: "https://link.in.jira.net/browse/AE-001",
         }
-    }, async ({homePage, loginPage, signupPage, apiClient}) => {
+    }, async ({action, apiClient}) => {
         /*
         Steps
         1.  Launch browser
@@ -48,15 +48,15 @@ test.describe('Automation Exercise - E2E - Signup / Login', () => {
         17. Click 'Delete Account' button
         18. Verify that 'ACCOUNT DELETED!' is visible and click 'Continue' button
         */
-        await expect.soft(homePage.homepageMarkerHeading).toBeVisible();
-        await loginPage.signup(validRegistrationData);
-        await signupPage.createAccount(validRegistrationData, true, true);
-        await expect.soft(signupPage.accountCreatedHeader).toBeVisible();
-        await signupPage.continueButton.click();
-        await signupPage.navBar.verifyLoggedInAs(validRegistrationData.name!)
-        await signupPage.deleteAccount();
+        await action.navigate.openHomePage();
+        await action.verify.isOnHomePage();
+        await action.navigate.toSignupLoginPage();
+        await action.verify.isOnLoginPage();
+        await action.authenticate.createAccount(validRegistrationData);
+        await action.verify.isUserLoggedIn(validRegistrationData.name!);
+        await action.authenticate.deleteAccount();
 
-        await test.step('Verify account is deleted', async () => {
+        await test.step('Verify account is deleted via API', async () => {
             const response = await apiClient.get(apiendpoints.account.get, validRegistrationData)
             verifyResponse(response, 404)
         });
@@ -68,7 +68,7 @@ test.describe('Automation Exercise - E2E - Signup / Login', () => {
             type: "userstory",
             description: "https://link.in.jira.net/browse/AE-002",
         }
-    }, async ({homePage, loginPage, signupPage, apiClient}) => {
+    }, async ({action, apiClient}) => {
         /*
         Steps
         1.  Launch browser
@@ -87,12 +87,15 @@ test.describe('Automation Exercise - E2E - Signup / Login', () => {
             verifyResponse(response, 201, apimessages.account.created)
         });
 
-        await expect.soft(homePage.homepageMarkerHeading).toBeVisible();
-        await loginPage.login(validRegistrationData);
-        await signupPage.navBar.verifyLoggedInAs(validRegistrationData.name!)
-        await signupPage.deleteAccount();
+        await action.navigate.openHomePage();
+        await action.verify.isOnHomePage();
+        await action.navigate.toSignupLoginPage();
+        await action.verify.isOnLoginPage();
+        await action.authenticate.login(validRegistrationData);
+        await action.verify.isUserLoggedIn(validRegistrationData.name!);
+        await action.authenticate.deleteAccount();
 
-        await test.step('Verify account is deleted', async () => {
+        await test.step('Verify account is deleted via API', async () => {
             const response = await apiClient.get(apiendpoints.account.get, validRegistrationData)
             verifyResponse(response, 404)
         });
@@ -103,7 +106,7 @@ test.describe('Automation Exercise - E2E - Signup / Login', () => {
             type: "userstory",
             description: "https://link.in.jira.net/browse/AE-003",
         }
-    }, async ({homePage, loginPage}) => {
+    }, async ({action}) => {
         /*
         Steps
         1. Launch browser
@@ -117,11 +120,13 @@ test.describe('Automation Exercise - E2E - Signup / Login', () => {
         */
         const invalidRegistrationData = new RegistrationFormDataBuilder()
             .build()
-        await expect.soft(homePage.homepageMarkerHeading).toBeVisible();
-        await homePage.navBar.signupLoginButton.click();
-        await expect.soft(loginPage.loginYourAccountHeader).toBeVisible();
-        await loginPage.login(invalidRegistrationData);
-        await expect(loginPage.loginIncorrectCredentials).toBeVisible();
+
+        await action.navigate.openHomePage();
+        await action.verify.isOnHomePage();
+        await action.navigate.toSignupLoginPage();
+        await action.verify.isOnLoginPage();
+        await action.authenticate.login(invalidRegistrationData);
+        await action.verify.isInvalidCredentialsProvided();
     });
 
 
@@ -130,7 +135,7 @@ test.describe('Automation Exercise - E2E - Signup / Login', () => {
             type: "userstory",
             description: "https://link.in.jira.net/browse/AE-004",
         }
-    }, async ({homePage, loginPage, apiClient}) => {
+    }, async ({action, apiClient}) => {
         /*
         Steps
         1.  Launch browser
@@ -149,14 +154,15 @@ test.describe('Automation Exercise - E2E - Signup / Login', () => {
             verifyResponse(response, 201, apimessages.account.created)
         });
 
-        await expect.soft(homePage.homepageMarkerHeading).toBeVisible();
-        await homePage.navBar.signupLoginButton.click();
-        await expect.soft(loginPage.loginYourAccountHeader).toBeVisible();
-        await loginPage.login(validRegistrationData);
-        await homePage.navBar.verifyLoggedInAs(validRegistrationData.name!)
-        await homePage.navBar.logoutButton.click();
-        await expect.soft(loginPage.loginYourAccountHeader).toBeVisible();
-
+        await action.navigate.openHomePage();
+        await action.verify.isOnHomePage();
+        await action.navigate.toSignupLoginPage();
+        await action.verify.isOnLoginPage();
+        await action.authenticate.login(validRegistrationData);
+        await action.verify.isUserLoggedIn(validRegistrationData.name!);
+        await action.authenticate.logout();
+        await action.verify.isOnLoginPage();
+        
         await test.step('Assert', async () => {
             const response = await apiClient.get(apiendpoints.account.get, validRegistrationData)
             verifyResponse(response, 200)
@@ -169,7 +175,7 @@ test.describe('Automation Exercise - E2E - Signup / Login', () => {
             type: "userstory",
             description: "https://link.in.jira.net/browse/AE-005",
         }
-    }, async ({homePage, loginPage, apiClient}) => {
+    }, async ({action, apiClient}) => {
         /*
         Steps
         1.  Launch browser
@@ -186,14 +192,12 @@ test.describe('Automation Exercise - E2E - Signup / Login', () => {
             verifyResponse(response, 201, apimessages.account.created)
         });
 
-        await expect.soft(homePage.homepageMarkerHeading).toBeVisible();
-        await homePage.navBar.signupLoginButton.click();
-        await loginPage.signup(validRegistrationData);
-        
-        await test.step('Assert', async () => {
-            await expect(loginPage.signupExistingCredentials).toBeVisible();
-        });
-
+        await action.navigate.openHomePage();
+        await action.verify.isOnHomePage();
+        await action.navigate.toSignupLoginPage();
+        await action.verify.isOnLoginPage();
+        await action.authenticate.signup(validRegistrationData);
+        await action.verify.isExistingCredentialsProvided();
     });
 
 });
@@ -206,7 +210,7 @@ test.describe('Automation Exercise - E2E - Pages', () => {
             type: "userstory",
             description: "https://link.in.jira.net/browse/AE-006",
         }
-    }, async ({homePage, contactUsPage}) => {
+    }, async ({action, contactUsPage}) => {
         /*
         Steps
         1.  Launch browser
@@ -229,16 +233,16 @@ test.describe('Automation Exercise - E2E - Pages', () => {
             fs.writeFileSync(filePath, message, 'utf8');
         });
 
-        await expect.soft(homePage.homepageMarkerHeading).toBeVisible();
-        await homePage.navBar.contactUsButton.click();
-        await expect(contactUsPage.getInTouchHeading).toBeVisible();
+        await action.navigate.openHomePage();
+        await action.verify.isOnHomePage();
+        await action.navigate.toContactUsPage();
+        await action.verify.isOnContactUsPage();
+
         await contactUsPage.submitContactUsForm(validRegistrationData, message, message, filePath);
         await expect.soft(contactUsPage.submitStatus).toBeVisible();
         await contactUsPage.homeButton.click();
 
-        await test.step('Assert', async () => {
-            await expect(homePage.homepageMarkerHeading).toBeVisible();
-        });
+        await action.verify.isOnHomePage();
 
     });
 
@@ -248,7 +252,7 @@ test.describe('Automation Exercise - E2E - Pages', () => {
             type: "userstory",
             description: "https://link.in.jira.net/browse/AE-007",
         }
-    }, async ({homePage, testcasesPage}) => {
+    }, async ({action, testcasesPage}) => {
         /*
         Steps
         1. Launch browser
@@ -257,8 +261,11 @@ test.describe('Automation Exercise - E2E - Pages', () => {
         4. Click on 'Test Cases' button
         5. Verify user is navigated to test cases page successfully
         */
-        await expect.soft(homePage.homepageMarkerHeading).toBeVisible();
-        await homePage.navBar.testCasesButton.click();
+        await action.navigate.openHomePage();
+        await action.verify.isOnHomePage();
+        await action.navigate.toTestCasesPage();
+
+        
         expect( await testcasesPage.testcaseHeading.count() ).toBe(26);
     });
 
@@ -375,7 +382,7 @@ test.describe('Automation Exercise - E2E - Product', () => {
             type: "userstory",
             description: "https://link.in.jira.net/browse/AE-008",
         }
-    }, async ({homePage, productsPage, productDetailsPage}) => {
+    }, async ({action}) => {
         /*
         Steps
         1. Launch browser
@@ -388,20 +395,12 @@ test.describe('Automation Exercise - E2E - Product', () => {
         8. User is landed to product detail page
         9. Verify that detail detail is visible: product name, category, price, availability, condition, brand
         */
-        await test.step('Act', async () => {
-            await expect.soft(homePage.homepageMarkerHeading).toBeVisible();
-            await homePage.navBar.productsButton.click();
-            await expect.soft(productsPage.allProductsHeading).toBeVisible();
-        });
-        
-        const productCard = await productsPage.getProductCardByIndex(0)
-        await productCard.viewProduct()
-
-        expect.soft(productDetailsPage.productAvailability).toContainText('In Stock');
-        expect.soft(productDetailsPage.productBrand).toContainText('Polo');
-        expect.soft(productDetailsPage.productCategory).toContainText('Women > Tops');
-        expect.soft(productDetailsPage.productName).toContainText('Blue Top');
-        expect.soft(productDetailsPage.productPrice).toContainText('Rs. 500');
+        await action.navigate.openHomePage();
+        await action.verify.isOnHomePage();
+        await action.navigate.toProductsPage();
+        await action.verify.isOnProductsPage();
+        await action.product.viewProductByIndex(0);
+        await action.verify.isProductDetailsAreCorrect('In Stock', 'Polo', 'Women > Tops', 'Blue Top', 500);
         
     });
 
@@ -410,7 +409,7 @@ test.describe('Automation Exercise - E2E - Product', () => {
             type: "userstory",
             description: "https://link.in.jira.net/browse/AE-009",
         }
-    }, async ({homePage, productsPage}) => {
+    }, async ({action, productsPage}) => {
         /*
         Steps
         1. Launch browser
@@ -422,12 +421,13 @@ test.describe('Automation Exercise - E2E - Product', () => {
         7. Verify 'SEARCHED PRODUCTS' is visible
         8. Verify all the products related to search are visible
         */
-        await expect.soft(homePage.homepageMarkerHeading).toBeVisible();
-        await homePage.navBar.productsButton.click();
-        await expect.soft(productsPage.allProductsHeading).toBeVisible();
-        await productsPage.searchProduct('dress')
+        await action.navigate.openHomePage();
+        await action.verify.isOnHomePage();
+        await action.navigate.toProductsPage();
+        await action.verify.isOnProductsPage();
+        await action.product.searchProduct('dress');
         
-        await test.step('Assert', async () => {
+        await test.step('Verify search result', async () => {
             const cardCollection = await productsPage.getAllProductCards();
             expect.soft(cardCollection.length).toBe(9);
             for (const card of cardCollection) {
@@ -442,7 +442,7 @@ test.describe('Automation Exercise - E2E - Product', () => {
             type: "userstory",
             description: "https://link.in.jira.net/browse/AE-012",
         }
-    }, async ({homePage, productsPage, cartPage}) => {
+    }, async ({action, cartPage}) => {
         /*
         Steps
         1.  Launch browser
@@ -456,21 +456,20 @@ test.describe('Automation Exercise - E2E - Product', () => {
         9.  Verify both products are added to Cart
         10. Verify their prices, quantity and total price
         */
-        await expect.soft(homePage.homepageMarkerHeading).toBeVisible();
-        await homePage.navBar.productsButton.click();
-        await expect.soft(productsPage.allProductsHeading).toBeVisible();
-        const card0 = await productsPage.getProductCardByIndex(0);
-        await card0.addToCartFromOverlay();
-        await productsPage.cartModal.continueShoppingButton.click()
-        const card1 = await productsPage.getProductCardByIndex(1);
-        await card1.addToCartFromOverlay();
-        await productsPage.cartModal.viewCartLink.click();
+        await action.navigate.openHomePage();
+        await action.verify.isOnHomePage();
+        await action.navigate.toProductsPage();
+        await action.verify.isOnProductsPage();
+        await action.product.addProductToCartFromCardOverlayByIndex(0);
+        await cartPage.cartModal.continueShopping();
+        await action.product.addProductToCartFromCardOverlayByIndex(1);
+        await cartPage.cartModal.viewCart();
         
         const expectedCart: [string, string, string, string][]  = [
             ['Blue Top', 'Rs. 500', '1', 'Rs. 500'],
             ['Men Tshirt', 'Rs. 400', '1', 'Rs. 400']
         ];
-        await cartPage.verifyCart(expectedCart);
+        await action.verify.isCartContentsAreCorrect(expectedCart);
     });
 
     test('Test Case 13: Verify Product quantity in Cart', {
@@ -478,7 +477,7 @@ test.describe('Automation Exercise - E2E - Product', () => {
             type: "userstory",
             description: "https://link.in.jira.net/browse/AE-012",
         }
-    }, async ({homePage, productsPage, productDetailsPage, cartPage}) => {
+    }, async ({action, cartPage}) => {
         /*
         Steps
         1. Launch browser
@@ -491,15 +490,18 @@ test.describe('Automation Exercise - E2E - Product', () => {
         8. Click 'View Cart' button
         9. Verify that product is displayed in cart page with exact quantity
         */
-        await expect.soft(homePage.homepageMarkerHeading).toBeVisible();
-        (await productsPage.getProductCardByIndex(0)).viewProduct()
-        await productDetailsPage.addToCart(4);
-        await productsPage.cartModal.viewCartLink.click();
+        await action.navigate.openHomePage();
+        await action.verify.isOnHomePage();
+        await action.navigate.toProductsPage();
+        await action.verify.isOnProductsPage();
+        await action.product.viewProductByIndex(0);
+        await action.product.addProductToCartFromDetails(4);
+        await cartPage.cartModal.viewCart();
         
         const expectedCart: [string, string, string, string][] = [
             ['Blue Top', 'Rs. 500', '4', 'Rs. 2000']
         ];
-        await cartPage.verifyCart(expectedCart);
+        await action.verify.isCartContentsAreCorrect(expectedCart);
     });
 
     test('Test Case 14: Place Order: Register while Checkout', {
@@ -507,7 +509,7 @@ test.describe('Automation Exercise - E2E - Product', () => {
             type: "userstory",
             description: "https://link.in.jira.net/browse/AE-014",
         }
-    }, async ({homePage, productsPage, cartPage, loginPage, signupPage}) => {
+    }, async ({action, cartPage}) => {
         /*
         Steps
         1.  Launch browser
@@ -531,6 +533,33 @@ test.describe('Automation Exercise - E2E - Product', () => {
         19. Click 'Delete Account' button
         20. Verify 'ACCOUNT DELETED!' and click 'Continue' button
         */
+        await action.navigate.openHomePage();
+        await action.verify.isOnHomePage();
+        await action.product.addProductToCartFromCardByIndex(0);
+        await cartPage.cartModal.continueShopping();
+        await action.product.addProductToCartFromCardByIndex(1);
+        await cartPage.cartModal.continueShopping();
+        await action.navigate.toCartPage();
+
+        await cartPage.proceedToCheckoutButton.click()
+
+        await cartPage.cartModal.registerOrLogin();
+        await action.verify.isOnLoginPage();
+        await action.authenticate.createAccount(validRegistrationData);
+        await action.verify.isUserLoggedIn(validRegistrationData.name!)
+        await action.navigate.toCartPage();
+
+        await cartPage.proceedToCheckoutButton.click()
+
+        const paymentData = new PaymentDataBuilder()
+            .withCardName(validRegistrationData.name!)
+            .build();
+
+        await action.cart.confirmOrder(paymentData);
+        await action.verify.isOrderPlacedSuccessfully();
+
+        await action.authenticate.deleteAccount();
+        /*
         await expect.soft(homePage.homepageMarkerHeading).toBeVisible();
         const card0 = await productsPage.getProductCardByIndex(0);
         await card0.addToCart();
@@ -562,6 +591,7 @@ test.describe('Automation Exercise - E2E - Product', () => {
         });
 
         await signupPage.deleteAccount();
+        */
     });
 
     test('Test Case 15: Place Order: Register before Checkout', {

@@ -1,4 +1,5 @@
 import { test as base} from '@playwright/test';
+import { Pages } from '../pages/pages';
 import { LoginPage }  from '../pages/login.page';
 import { SignupPage } from '../pages/signup.page';
 import { HomePage } from '../pages/home.page';
@@ -8,7 +9,7 @@ import { TestCasesPage } from '../pages/testcases.page';
 import { ProductsPage, ProductDetailsPage } from '../pages/products.page';
 import { CartPage } from '../pages/cart.page';
 import { ConsoleErrorReader } from '../utils/consolereader';
-
+import { Action, createActions } from '../actions/actions';
 
 type API = {
     apiClient: ApiClient;
@@ -23,20 +24,7 @@ export type ConsoleErrorLoggerOptions = {
     failTestOnConsoleError: boolean;
 };
 
-
-type Pages = {
-    
-    homePage: HomePage;
-    loginPage: LoginPage;
-    signupPage: SignupPage;
-    contactUsPage: ContactUsPage;
-    testcasesPage: TestCasesPage;
-    productsPage: ProductsPage;
-    productDetailsPage: ProductDetailsPage;
-    cartPage: CartPage;
-};
-
-export const test = base.extend<Pages & ConsoleErrorLogger & ConsoleErrorLoggerOptions & API>({
+export const test = base.extend<Pages & ConsoleErrorLogger & ConsoleErrorLoggerOptions & API & Action>({
 
     failTestOnConsoleError: [true, { option: true }],
 
@@ -76,6 +64,11 @@ export const test = base.extend<Pages & ConsoleErrorLogger & ConsoleErrorLoggerO
 
     cartPage: async ({page}, use) => {
         await use(new CartPage(page));
+    },
+
+    
+    action: async ({ page }, use) => {
+        await use(createActions(page));
     },
 
     consoleErrorReader: [async ({ page, failTestOnConsoleError}, use, testInfo) => {

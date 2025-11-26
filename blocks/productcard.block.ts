@@ -11,7 +11,7 @@ export class ProductCardBlock {
     readonly productInfo: Locator;
     readonly productOverlay: Locator;
     
-    private readonly addToCartText: string = 'Add to cart';
+    public readonly addToCartText: string = 'Add to cart';
 
     constructor(readonly root: Locator) {
 

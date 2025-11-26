@@ -32,6 +32,7 @@ export class BasePage {
     public async open() {
         await this.page.goto(this.url);
         await this.page.waitForURL(new RegExp(this.url), { waitUntil: "load" });
+        //await this.page.waitForURL(`**${this.url}`);
 
         // Disable animation once a page is loaded
         await this.page.emulateMedia( { reducedMotion: "reduce" } )
@@ -45,7 +46,7 @@ export class BasePage {
     public async getHeight(): Promise<number> {
         const pageHeight = await this.page.evaluate(() => {
         // This will return the height of the entire content, including overflow
-        return document.body.scrollHeight; 
+            return document.body.scrollHeight; 
         });
         return pageHeight;
     }

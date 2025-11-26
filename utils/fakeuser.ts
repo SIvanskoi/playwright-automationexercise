@@ -211,7 +211,24 @@ export class RegistrationFormDataBuilder {
         return { ...this.data };
     }
 
-    toJSON(): string {
+    public toJSON(): string {
         return JSON.stringify(this.data)
+    }
+
+    /**
+    * Converts object to x-www-form-urlencoded format
+    */
+    public toFormUrlEncoded(): string {
+        const obj = this.data as Record<string, any>;
+        return Object.keys(obj)
+            .filter(key => obj[key] !== undefined)
+            .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(obj[key])}`)
+            .join('&');
+        /*
+        return Object.keys(this.data)
+        .filter(key: => this.data[key] !== undefined)
+        .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(this.data[key])}`)
+        .join('&');
+        */
     }
 }

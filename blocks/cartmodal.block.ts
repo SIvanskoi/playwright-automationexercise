@@ -15,4 +15,19 @@ export class CartModalBlock {
         this.viewCartLink = this.root.getByRole('link', { name: 'View Cart' });
         this.registerLoginLink = this.root.getByRole('link', { name: 'Register / Login' });
     }
+
+    @step('Close cart modal by continuing shopping')
+    public async continueShopping(): Promise<void> {
+        await this.continueShoppingButton.click();
+    }
+
+    @step('Close cart modal by viewing cart')
+    public async viewCart(): Promise<void> {
+        await this.viewCartLink.click();
+    }
+
+    @step('Close cart modal by registering or logging in')
+    public async registerOrLogin(): Promise<void> {
+        await this.registerLoginLink.click();
+    }
 }

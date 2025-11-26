@@ -13,4 +13,9 @@ export class TestCasesPage extends BasePage {
         this.testcaseHeading = this.page.locator('//u[contains(text(), "Test Case")]')
     }
 
+    public async verifyTestCasesPage(): Promise<void> {
+        await this.page.waitForURL(`**${this.url}`);
+        await this.testcaseHeading.waitFor({ state: 'visible' });
+    }
+
 }

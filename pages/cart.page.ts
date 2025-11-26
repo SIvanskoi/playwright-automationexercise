@@ -7,7 +7,7 @@ import { step } from '../utils/step';
 
 export class CartPage extends BasePage {
 
-    private readonly tableRow: Locator;
+    readonly tableRow: Locator;
     readonly proceedToCheckoutButton: Locator;
     
     readonly contunueOnCartButton: Locator;
@@ -44,6 +44,8 @@ export class CartPage extends BasePage {
         this.orderSuccessfulText = this.page.getByText(uimessages.order.success);
         this.downloadInvoiceButton = this.page.getByRole('link', { name: 'Download Invoice' })
     }
+
+    
 
     /**
      * Deletes a product in cart table.
