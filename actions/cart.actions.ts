@@ -4,7 +4,7 @@ import { type Pages, createPages } from '../pages/pages';
 import { PaymentData } from '../utils/fakecard';
 
 
-class CartActions {
+export default class CartActions {
     private pages: Pages;
 
     constructor(page: Page) {
